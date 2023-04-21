@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 router = APIRouter()
 templates = Jinja2Templates(directory="templates/")
-
+url = "localhost:8000"
 @router.get('/', response_class=HTMLResponse)
 async def test(request: Request):
     return templates.TemplateResponse('test.html', {'request': request})
@@ -41,21 +41,26 @@ async def get_list_of_chief_editors(request: Request):
 
 @router.get("/projects")
 async def show_projects(request: Request):
+    
     chief_editors_list = await users.get_list_of_chief_editors()
+    
+    project_names = await users.get_projects()
+    projects = []
+    for i in project_names:
+        project = await users.get_project(i)
+        projects.append(project)
     user = await users.get_current_user_from_cookie(request)
     if user['role'] == 'project_manager':
-        return templates.TemplateResponse('projects.html', {'request': request, 'chief_editors_list': chief_editors_list})
+        return templates.TemplateResponse('projects.html', {'request': request, 'chief_editors_list': chief_editors_list, 'projects': projects})
     raise HTTPException(status_code=400, detail='Incorrect user role')
     #return RedirectResponse("http://localhost:8000/")
 
 @router.post("/create_project")
 async def create_project(request: Request):
     result = await request.form()
-    print(result)
     project_name = result['project_name']
     deadline = result['deadline'].split('-')
     editors = result['editors']
-    print(result)
     activity = {
         'activity_name': 'initial_activity',
         'project_name': project_name,
@@ -66,7 +71,7 @@ async def create_project(request: Request):
         'completeness': 0
     }
     approve = await users.create_activity(models.ActivityModel(**activity))
-    return approve
+    return RedirectResponse(f'http://{url}/projects', status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/project")
 async def show_project(request: Request):
@@ -148,12 +153,12 @@ async def forgot_password(request: Request, not_valid: bool = False):
 async def auth(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     user = await users.get_user_by_login(login=form_data.username)
     if not user:
-        raise HTTPException(status_code=302, detail="Incorrect login or password", headers = {"Location": "http://localhost:8000/login?not_valid=true"})
+        raise HTTPException(status_code=302, detail="Incorrect login or password", headers = {"Location": f"http://{url}/login?not_valid=true"})
         
     if not users.validate_password(
         password=form_data.password, hashed_password=user["password"]
     ):
-        raise HTTPException(status_code=302, detail="Incorrect login or password", headers = {"Location": "http://localhost:8000/login?not_valid=true"})
+        raise HTTPException(status_code=302, detail="Incorrect login or password", headers = {"Location": f"http://{url}/login?not_valid=true"})
 
     token = await users.create_user_token(user_id=users.user_helper(user)["id"])
     response.set_cookie(
@@ -162,7 +167,7 @@ async def auth(response: Response, form_data: OAuth2PasswordRequestForm = Depend
         httponly=True,
         expires=1800
     )
-    response_project_manager = RedirectResponse('http://localhost:8000/projects', status_code=status.HTTP_303_SEE_OTHER)
+    response_project_manager = RedirectResponse(f'http://{url}/projects', status_code=status.HTTP_303_SEE_OTHER)
     response_project_manager.set_cookie(
         key=users.COOKIE_NAME,
         value=token,

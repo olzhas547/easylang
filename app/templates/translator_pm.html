@@ -10,10 +10,18 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link href="../static/style.css" rel="stylesheet" />
-    <title>Projects</title>
+    <link href="./style.css" rel="stylesheet" />
+    <title>Translator</title>
   </head>
   <body>
+    <header>
+      <form method="post" action="process.php">
+        <button type="Logout" name="Logout" value="Logout"> <a href="C:\Users\Леново\Downloads\registration_page.html">
+          <img src="C:\Users\Леново\Downloads\log-out-transformed.png" alt="Logout logo" width="40px" height="40px" style="position:fixed; top: 0; right: 0;">
+        </a>
+        </button>
+      </form>
+    </header>
     <main class="d-flex flex-nowrap">
       <nav class="col-lg-2" style="background: #449ed1" id="nav">
         <div class="flex-shrink-0 p-3" style="width: 100%">
@@ -181,7 +189,6 @@
           </ul>
         </div>
       </nav>
-      <div class="b-example-divider b-example-vr"></div>
 
       <!-- Here starts content part -->
 
@@ -194,11 +201,15 @@
               <li class="breadcrumb-item">
                 <a
                   class="link-body-emphasis fw-semibold text-decoration-none"
-                  href="http://localhost:8000/projects"
+                  href="#"
                   >Projects</a
                 >
               </li>
-              
+              <li class="breadcrumb-item" aria-current="page">Project 1</li>
+
+              <li class="breadcrumb-item active" aria-current="page">
+                Activity 1
+              </li>
             </ol>
           </nav>
         </div>
@@ -267,32 +278,7 @@
           <div class="mt-5">
             <div class="row mb-3">
               <div class="col-md-4">
-                <h3>
-                  Projects
-                  <!-- Button trigger modal -->
-                  <button
-                    type="button"
-                    class="btn"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      class="bi bi-plus-circle"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
-                      />
-                      <path
-                        d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
-                      />
-                    </svg>
-                  </button>
-                </h3>
+                <h3>Translator 1</h3>
               </div>
 
               <div class="col-md-4"></div>
@@ -307,58 +293,134 @@
                 </form>
               </div>
             </div>
-          </div>
 
-          <div>
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-            
-              {% for project in projects %}
-              <div class="col">
-                <div class="card shadow-sm">
-                  <div class="modal-content rounded-4 shadow p-4">
-                    <div class="modal-header border-bottom-0">
-                      <h1 class="modal-title fs-5">{{ project['project_name'] }}</h1>
-                      <button
-                        type="button"
-                        class="btn-close"
-                        aria-label="Close"
-                      ></button>
-                    </div>
-                    <div class="">
-                      <p>{{ project['chief_editor'] }}</p>
-                      <p>{{ project['status'] }}</p>
-
-                      <p>{{ project['deadline'] }}</p>
-                    </div>
-                    <div
-                      class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0"
-                    >
-                      <button type="button" class="btn btn-secondary">
-                        Finish the project
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
+            <table
+              class="table bg-body-tertiary rounded rounded-4 overflow-hidden text-center"
+            >
+              <thead>
+                <tr class="bg-danger text-white">
+                  <th scope="col">Activity</th>
+                  <th scope="col">Project</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Left hours</th>
+                  <th scope="col">Effectiveness</th>
+                  <th scope="col">Deadline</th>
+                  <th scope="col">Priority</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Activity 1</th>
+                  <td>Project 1</td>
+                  <td>in work</td>
+                  <td>20 hours</td>
+                  <td>stable</td>
+                  <td></td>
+                 
+                  <td><p class="text-warning">medium</p></td>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Activity 2</th>
+                  <td>Project 2</td>
+                  <td>rewriting</td>
+                  <td>2 hours</td>
+                  <td>-20%</td>
+                  <td></td>
+                  <td><p class="text-danger">high</p></td>
+                 
+                </tr>
+                <tr>
+                  <th scope="row">Activity 3</th>
+                  <td>Project 7</td>
+                  <td>checking</td>
+                  <td>9 hours</td>
+                  <td>+10%</td>
+                  <td></td>
+                  <td><p class="text-dark">low</p></td>
+                 
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Activity 4</th>
+                  <td>Project 2</td>
+                  <td>checking</td>
+                  <td>21 hours</td>
+                  <td>-50%</td>
+                  <td></td>
+                  <td><p class="text-warning">medium</p></td>
+                 
+                </tr>
+                <tr>
+                  <th scope="row">Activity 5</th>
+                  <td>Project 3</td>
+                  <td>assigned</td>
+                  <td>47 minutes</td>
+                  <td>-10%</td>
+                  <td></td>
+                  <td><p class="text-danger">high</p></td>
+                  
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Modal -->
+    <!-- Modals -->
     <div
       class="modal fade"
-      id="exampleModal"
+      id="report"
       tabindex="-1"
-      aria-labelledby="exampleModalLabel"
+      aria-labelledby="reportedLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">New project</h1>
+            <h1 class="modal-title fs-5" id="reportedLabel">Report type</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <button
+              type="button"
+              class="btn bg-secondary text-white w-25"
+              data-bs-toggle="modal"
+              data-bs-target="#daily"
+            >
+              Daily
+            </button>
+            <button
+              type="button"
+              class="btn bg-secondary text-white w-25"
+              data-bs-toggle="modal"
+              data-bs-target="#weekly"
+            >
+              Weekly
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="daily"
+      tabindex="-1"
+      aria-labelledby="dailyLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="dailyLabel">Daily report</h1>
             <button
               type="button"
               class="btn-close"
@@ -367,37 +429,121 @@
             ></button>
           </div>
           <div class="modal-body">
-            <form action="create_project" method="post">
-              <div class="mb-3">
-                <label for="recipient-name" class="col-form-label"
-                  >Set the project name:</label
-                >
-                <input required type="text" name="project_name" class="form-control" id="recipient-name" />
-              </div>
-              <div class="mb-3">
-                <label for="message-text" class="col-form-label"
-                  >Set deadline date:</label
-                >
-                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
-              </div>
-
-              <div class="mb-3">
-                <label for="exampleSelect" class="form-label"
-                  >Assign a chief editor</label
-                >
-                <select required class="form-select" id="exampleSelect" name="editors">
-                  <!--option selected="">Choose a chief editor</option-->
-                  {% for chief_editor in chief_editors_list %}
-                  <option value="{{chief_editor}}">{{chief_editor}}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="modal-footer">
-            <button class="svv" type="submit"> Save </button>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label"
+                >Date: DD/MM/YY</label
+              >
+              <input
+                type="date"
+                class="form-control bg-body-secondary"
+                id="date"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label"
+                >Volume of translated text (in %):</label
+              >
+              <input
+                type="text"
+                class="form-control bg-body-secondary"
+                id="volume"
+              />
+            </div>
           </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="weekly"
+      tabindex="-1"
+      aria-labelledby="weeklyLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="weeklyLabel">Weekly report</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label"
+                >Week date: DD/MM/YY - DD/MM/YY</label
+              >
+              <input
+                type="date"
+                class="form-control bg-body-tertiary"
+                id="from"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label"
+                >Amount of time left (in %):</label
+              >
+              <input
+                type="text"
+                class="form-control bg-body-tertiary"
+                id="amount_time"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="send"
+      tabindex="-1"
+      aria-labelledby="sendLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="sendLabel">Send to rewrite</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <textarea
+                  class="form-control text-dark bg-body-secondary"
+                  style="height: 200px"
+                  id="message-text"
+                  placeholder="Type a text..."
+                ></textarea>
+              </div>
             </form>
           </div>
-          
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-success">Save</button>
+          </div>
         </div>
       </div>
     </div>
@@ -407,6 +553,7 @@
     src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
     crossorigin="anonymous"
-  >
-  </script>
+  ></script>
+
+  
 </html>

@@ -1,10 +1,12 @@
 import pytest
 from httpx import AsyncClient
 from bson.objectid import ObjectId
+from pydantic import ValidationError
 import datetime
 
 from app import app
 from src import users
+import models
 
 @pytest.mark.anyio
 async def test_auth_valid_password():
@@ -121,3 +123,66 @@ def test_token_helper_invalid():
     }
     with pytest.raises(KeyError):
         users.user_helper(token)
+        
+
+
+
+
+
+@pytest.mark.anyio
+async def test_create_project():
+    '''
+    WHEN
+    Project name IS Test Project 4
+    Deadline IS 2023-04-23
+    Chief Editor IS Chief Editor 2
+    
+    THEN
+    Project created
+    '''
+    request_create_project = 'project_name=Test+Project+4&deadline=2023-04-23&editors=Chief+Editor+2'
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response_create_project = await ac.post("/create_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_create_project)
+    assert response_create_project.status_code == 303
+
+@pytest.mark.anyio
+async def test_create_project_invalid():
+    '''
+    WHEN
+    Project name IS Test Project 4
+    Deadline IS 2023-04-23
+    
+    THEN
+    Project not created. Chief editor not found
+    '''
+    with pytest.raises(KeyError):
+        request_create_project_invalid = 'project_name=Test+Project+4&deadline=2023-04-19'
+        async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+            await ac.post("/create_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_create_project_invalid)
+
+@pytest.mark.anyio
+async def test_create_activity():
+    activity = {
+        'activity_name': 'initial_activity',
+        'project_name': 'project_name',
+        'translators': None,
+        'editors': 'editor',
+        'deadline': datetime.datetime(int('2022'), int('08'), int('05'), 0, 0),
+        'project_status': 'created',
+        'completeness': 0
+    }
+    result = await users.create_activity(models.ActivityModel(**activity))
+    assert type(result) is str
+
+@pytest.mark.anyio
+async def test_create_activity_invalid():
+    with pytest.raises(ValidationError):
+        activity = {
+            'activity_name': 'initial_activity',
+            'translators': None,
+            'editors': 'editor',
+            'deadline': datetime.datetime(int('2022'), int('08'), int('05'), 0, 0),
+            'project_status': 'created',
+            'completeness': 0
+        }
+        await users.create_activity(models.ActivityModel(**activity))

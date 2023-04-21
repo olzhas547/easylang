@@ -34,8 +34,8 @@ def project_helper(activity) -> dict:
     return {
         'project_name': activity['project_name'],
         'chief_editor': str(activity['editors']),
-        'status': 'placeholder',
-        'deadline': 'placeholder'
+        'status': activity['project_status'],
+        'deadline': str(activity['deadline'])
     }
 
 def activity_helper(activity) -> dict:
@@ -172,7 +172,6 @@ async def get_projects():
 
 async def get_project(project_name: str):
     result = await database.activities_collection.find_one({'project_name': project_name})
-    print(result)
     return project_helper(result)
 
 async def get_activities():
@@ -181,7 +180,6 @@ async def get_activities():
 
 async def get_activity(activity_name: str):
     result = await database.activities_collection.find_one({'activity_name': activity_name})
-    print(result)
     return activity_helper(result)
 
 async def get_activities_of_the_project(project: str):
