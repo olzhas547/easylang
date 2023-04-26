@@ -35,7 +35,8 @@ def project_helper(activity) -> dict:
         'project_name': activity['project_name'],
         'chief_editor': str(activity['editors']),
         'status': activity['project_status'],
-        'deadline': str(activity['deadline'])
+        'deadline': str(activity['deadline']),
+        'id': str(activity['_id'])
     }
 
 def activity_helper(activity) -> dict:
@@ -166,12 +167,21 @@ async def set_activity_editor(activity: ObjectId, editor_id: ObjectId):
     result = await database.activities_collection.update_one({"_id": activity}, {"$set" : {"editor": editor_id}})
     return result.modified_count
 
+async def edit_project(activity: ObjectId, activity_id: str):
+    result = await database.activities_collection.update_one({"_id": ObjectId(activity_id)}, {"$set" : {'project_name': activity.project_name, 'deadline': activity.deadline, 'editors': activity.editors}})
+    print(result.modified_count)
+    return result.modified_count
+
 async def get_projects():
     result = await database.activities_collection.distinct('project_name')
     return result
 
 async def get_project(project_name: str):
     result = await database.activities_collection.find_one({'project_name': project_name})
+    return project_helper(result)
+
+async def get_project_by_id(project_id: str):
+    result = await database.activities_collection.find_one({'_id': ObjectId(project_id)})
     return project_helper(result)
 
 async def get_activities():
@@ -188,8 +198,8 @@ async def get_activities_of_the_project(project: str):
         activities_list.append(activity_helper(activity))
     return activities_list
 
-async def get_list_of_chief_editors():
-    chief_editors = []
-    async for user in database.users_collection.find({'role': 'chief_editor'}):
-        chief_editors.append(user_helper(user)['username'])
-    return chief_editors
+async def get_list_of_users(role: str):
+    users = []
+    async for user in database.users_collection.find({'role': role}):
+        users.append(user_helper(user)['username'])
+    return users

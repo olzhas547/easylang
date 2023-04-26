@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from bson.objectid import ObjectId
 from src import users
+import math
 import models
 import datetime
 import database
@@ -33,27 +34,50 @@ async def get_project_names(request: Request):
 async def get_activities_of_the_project(request: Request, project: str):
     return await users.get_activities_of_the_project(project)
 
-@router.get('/get_list_of_chief_editors')
-async def get_list_of_chief_editors(request: Request):
-    return await users.get_list_of_chief_editors()
 
 ###############################################################################
 
 @router.get("/projects")
-async def show_projects(request: Request):
+async def show_projects(request: Request, page: int = 1):
     
-    chief_editors_list = await users.get_list_of_chief_editors()
+    chief_editors_list = await users.get_list_of_users('chief_editor')
+    translators_list = await users.get_list_of_users('translator')
     
     project_names = await users.get_projects()
     projects = []
     for i in project_names:
         project = await users.get_project(i)
         projects.append(project)
+    projects = sorted(projects, key=lambda d: d['deadline']) 
+    projects_current_page = projects[8*(page-1):8*page]
+    num_of_pages = [x+1 for x in range(math.floor(len(projects)/8) + 1)]
     user = await users.get_current_user_from_cookie(request)
+    if not user:
+        return RedirectResponse(f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER)
     if user['role'] == 'project_manager':
-        return templates.TemplateResponse('projects.html', {'request': request, 'chief_editors_list': chief_editors_list, 'projects': projects})
-    raise HTTPException(status_code=400, detail='Incorrect user role')
-    #return RedirectResponse("http://localhost:8000/")
+        return templates.TemplateResponse('projects.html', {'request': request, 'chief_editors_list': chief_editors_list, 'all_projects': projects, 'projects': projects_current_page, 'translators_list': translators_list, 'num_of_pages': num_of_pages, 'current_page': page})
+    return RedirectResponse(f'http://{url}', status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/project/{project_id}")
+async def show_project(request: Request, project_id: str):
+    chief_editors_list = await users.get_list_of_users('chief_editor')
+    translators_list = await users.get_list_of_users('translator')
+    
+    project_names = await users.get_projects()
+    projects = []
+    for i in project_names:
+        project = await users.get_project(i)
+        projects.append(project)
+    
+    project =  await users.get_project_by_id(project_id)
+    print(project)
+    user = await users.get_current_user_from_cookie(request)
+    if not user:
+        return RedirectResponse(f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER)
+    if user['role'] == 'project_manager':
+        return templates.TemplateResponse('project.html', {'request': request, 'chief_editors_list': chief_editors_list, 'all_projects': projects, 'translators_list': translators_list, 'current_project_name': project['project_name'], 'current_chief_editor': project['chief_editor']})
+    return RedirectResponse(f'http://{url}', status_code=status.HTTP_303_SEE_OTHER)
+    
 
 @router.post("/create_project")
 async def create_project(request: Request):
@@ -73,8 +97,27 @@ async def create_project(request: Request):
     approve = await users.create_activity(models.ActivityModel(**activity))
     return RedirectResponse(f'http://{url}/projects', status_code=status.HTTP_303_SEE_OTHER)
 
+@router.post("/edit_project")
+async def edit_project(request: Request):
+    result = await request.form()
+    project_name = result['project_name']
+    deadline = result['deadline'].split('-')
+    editors = result['editors']
+    activity = {
+        'activity_name': 'initial_activity',
+        'project_name': project_name,
+        'translators': None,
+        'editors': editors,
+        'deadline': datetime.datetime(int(deadline[0]), int(deadline[1]), int(deadline[2]), 0, 0),
+        'project_status': 'created',
+        'completeness': 0
+    }
+    print(activity)
+    approve = await users.edit_project(models.ActivityModel(**activity), result['_id'])
+    return RedirectResponse(f'http://{url}/projects', status_code=status.HTTP_303_SEE_OTHER)
+
 @router.get("/project")
-async def show_project(request: Request):
+async def show_project_html(request: Request):
     user = await users.get_current_user_from_cookie(request)
     if user['role'] == 'project_manager':
         return templates.TemplateResponse('project.html', {'request': request})
@@ -172,7 +215,7 @@ async def auth(response: Response, form_data: OAuth2PasswordRequestForm = Depend
         key=users.COOKIE_NAME,
         value=token,
         httponly=True,
-        expires=1800
+        expires=86400
     )
     if user['role'] == 'project_manager':
         return response_project_manager
@@ -214,3 +257,9 @@ async def set_activity_editor(activity: str, editor_id: str, current_user: model
     if current_user["role"] != 'project_manager':
         raise HTTPException(status_code=400, detail='Incorrect user role')
     return await users.set_activity_editor(ObjectId(activity), ObjectId(editor_id))
+
+@router.post("/logout")
+async def logout(response: Response):
+    response_logout = RedirectResponse(f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER)
+    response_logout.delete_cookie(key=users.COOKIE_NAME)
+    return response_logout

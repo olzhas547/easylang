@@ -10,8 +10,7 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link href="../static/project_style.css" rel="stylesheet" />
-
+    <link href="../static/style.css" rel="stylesheet" />
     <title>Projects</title>
   </head>
   <body>
@@ -36,7 +35,7 @@
               </button>
               <div class="collapse" id="projects-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for project in all_projects %}
+                {% for project in projects %}
                   <li>
                     <a
                       href="/project/{{ project['id'] }}"
@@ -52,6 +51,41 @@
               <button
                 class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
                 data-bs-toggle="collapse"
+                data-bs-target="#activities-collapse"
+                aria-expanded="false"
+              >
+                Activities
+              </button>
+              <div class="collapse" id="activities-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Activity 1</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Activity 2</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Activity 3</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="mb-1">
+              <button
+                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
+                data-bs-toggle="collapse"
                 data-bs-target="#chief-editors-collapse"
                 aria-expanded="false"
               >
@@ -59,7 +93,7 @@
               </button>
               <div class="collapse" id="chief-editors-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for chief_editor in chief_editors_list %}
+                {% for chief_editor in chief_editors_list %}
                   <li>
                     <a
                       href="#"
@@ -83,7 +117,7 @@
               </button>
               <div class="collapse" id="translators-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for translator in translators_list %}
+                {% for translator in translators_list %}
                   <li>
                     <a
                       href="#"
@@ -95,7 +129,9 @@
                 </ul>
               </div>
             </li>
+
             <li class="border-top my-3"></li>
+
             <li class="mb-1">
               <button
                 class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
@@ -105,21 +141,19 @@
               >
                 Notifications
               </button>
-              
-         
             </li>
+            <li class="border-top my-3"></li>
+              <form method="post" action="logout">
+                <button class="svv" type="Logout" name="Logout" value="Logout"> Log Out </button>
+              </form>
           </ul>
         </div>
       </nav>
       <div class="b-example-divider b-example-vr"></div>
 
       <!-- Here starts content part -->
-      
 
       <div class="p-3 maining">
-        <form method="post" action="logout">
-          <button class="lg" type="Logout" name="Logout" value="Logout"> Log Out </button>
-        </form>
         <div class="container my-5">
           <nav aria-label="breadcrumb">
             <ol
@@ -245,12 +279,18 @@
 
           <div>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-            {% for project in projects %}
+            
+              {% for project in projects %}
               <div class="col">
                 <div class="card shadow-sm">
                   <div class="modal-content rounded-4 shadow p-4">
                     <div class="modal-header border-bottom-0">
                       <h1 class="modal-title fs-5">{{ project['project_name'] }}</h1>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        aria-label="Close"
+                      ></button>
                     </div>
                     <div class="">
                       <p>{{ project['chief_editor'] }}</p>
@@ -261,11 +301,8 @@
                     <div
                       class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0"
                     >
-                      <button  type="button"
-                              class="btn-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#exampleModal{{loop.index}}">
-                        Edit the Project
+                      <button type="button" class="btn btn-secondary">
+                        Finish the project
                       </button>
                     </div>
                   </div>
@@ -277,17 +314,7 @@
         </div>
       </div>
     </main>
-    <div class="pagination_section"> 
-      {% if current_page != 1 %}
-      <a href="/projects?page={{current_page-1}}"><< Previous</a> 
-      {% endif %}
-      {% for num in num_of_pages %}
-      <a href="/projects?page={{num}}" >{{num}}</a>
-      {% endfor %}
-      {% if current_page != num_of_pages[-1] %}
-      <a  href="/projects?page={{current_page+1}}">Next >></a> 
-      {% endif %}
-     </div>
+
     <!-- Modal -->
     <div
       class="modal fade"
@@ -341,117 +368,9 @@
           
         </div>
       </div>
-    </div><div
-      class="modal fade"
-      id="exampleModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">New project</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form action="create_project" method="post">
-              <div class="mb-3">
-                <label for="recipient-name" class="col-form-label"
-                  >Set the project name:</label
-                >
-                <input required type="text" name="project_name" class="form-control" id="recipient-name" />
-              </div>
-              <div class="mb-3">
-                <label for="message-text" class="col-form-label"
-                  >Set deadline date:</label
-                >
-                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
-              </div>
-
-              <div class="mb-3">
-                <label for="exampleSelect" class="form-label"
-                  >Assign a chief editor</label
-                >
-                <select required class="form-select" id="exampleSelect" name="editors">
-                  <!--option selected="">Choose a chief editor</option-->
-                  {% for chief_editor in chief_editors_list %}
-                  <option value="{{chief_editor}}">{{chief_editor}}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="modal-footer">
-            <button class="svv" type="submit"> Save </button>
-          </div>
-            </form>
-          </div>
-          
-        </div>
-      </div>
     </div>
-
-
-
-    {% for project in projects %}
-    <div
-            class="modal fade"
-            id="exampleModal{{loop.index}}"
-            tabindex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel1">Edit project</h1>
-            <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form action="edit_project" method="post">
-              <div class="mb-3">
-                <label for="recipient-name" class="col-form-label"
-                >Edit the project name:</label
-                >
-                <input required type="text" name="project_name" class="form-control" id="recipient-name" />
-              </div>
-              <div class="mb-3">
-                <label for="message-text" class="col-form-label"
-                >Edit deadline date:</label
-                >
-                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
-              </div>
-              <input hidden required type="text" name="_id" value="{{project['id']}}" class="form-control" id="recipient-name" />
-              <div class="mb-3">
-                <label for="exampleSelect" class="form-label"
-                >Edit a chief editor</label
-                >
-                <select required class="form-select" id="exampleSelect" name="editors">
-                  {% for chief_editor in chief_editors_list %}
-                  <option value="{{chief_editor}}">{{chief_editor}}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="modal-footer">
-                <button class="svv" type="submit"> Save </button>
-              </div>
-            </form>
-          </div>
-</div>
-        </div>
-      </div>
-        {% endfor %}
   </body>
- 
+
   <script
     src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"

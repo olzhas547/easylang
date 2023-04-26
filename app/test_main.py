@@ -186,3 +186,34 @@ async def test_create_activity_invalid():
             'completeness': 0
         }
         await users.create_activity(models.ActivityModel(**activity))
+
+@pytest.mark.anyio
+async def test_edit_project():
+    '''
+    WHEN
+    Project name IS Test Project 4
+    Deadline IS 2023-05-09
+    Chief Editor IS Chief Editor 2
+    
+    THEN
+    Project edited
+    '''
+    request_edit_project = 'project_name=Test+Project+4&deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response_edit_project = await ac.post("/edit_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_edit_project)
+    assert response_edit_project.status_code == 303
+
+@pytest.mark.anyio
+async def test_edit_project_invalid():
+    '''
+    WHEN
+    Deadline IS 2023-05-09
+    Chief Editor IS Chief Editor 2
+    
+    THEN
+    Project not edited
+    '''
+    with pytest.raises(KeyError):
+        request_edit_project = 'deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+        async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+            await ac.post("/edit_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_edit_project)

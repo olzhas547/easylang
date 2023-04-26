@@ -10,7 +10,7 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link href="../static/project_style.css" rel="stylesheet" />
+    <link href="./style.css" rel="stylesheet" />
     <title>Project</title>
   </head>
   <body>
@@ -35,15 +35,27 @@
               </button>
               <div class="collapse" id="projects-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for project in all_projects %}
                   <li>
                     <a
-                      href="/project/{{ project['id'] }}"
+                      href="#"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{ project['project_name'] }}</a
+                      >Project 1</a
                     >
                   </li>
-                  {% endfor %}
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Project 2</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Project 3</a
+                    >
+                  </li>
                 </ul>
               </div>
             </li>
@@ -93,15 +105,27 @@
               </button>
               <div class="collapse" id="chief-editors-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for chief_editor in chief_editors_list %}
                   <li>
                     <a
                       href="#"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{chief_editor}}</a
+                      >Chief editor 1</a
                     >
                   </li>
-                  {% endfor %}
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Chief editor 2</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Chief editor 3</a
+                    >
+                  </li>
                 </ul>
               </div>
             </li>
@@ -117,15 +141,27 @@
               </button>
               <div class="collapse" id="translators-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for translator in translators_list %}
                   <li>
                     <a
                       href="#"
                       class="link-dark d-inline-flex text-decoration-none rounded"
-                      >{{translator}}</a
+                      >Translator 1</a
                     >
                   </li>
-                  {% endfor %}
+                  <li>
+                    <a
+                      href="#"
+                      class="link-dark d-inline-flex text-decoration-none rounded"
+                      >Translators</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-dark d-inline-flex text-decoration-none rounded"
+                      >Translators</a
+                    >
+                  </li>
                 </ul>
               </div>
             </li>
@@ -157,11 +193,15 @@
               <li class="breadcrumb-item">
                 <a
                   class="link-body-emphasis fw-semibold text-decoration-none"
-                  href="/projects"
+                  href="#"
                   >Projects</a
                 >
               </li>
-              <li class="breadcrumb-item" aria-current="page">{{ current_project_name }}</li>
+              <li class="breadcrumb-item" aria-current="page">Project 1</li>
+
+              <li class="breadcrumb-item active" aria-current="page">
+                Activity 1
+              </li>
             </ol>
           </nav>
         </div>
@@ -230,7 +270,7 @@
           <div class="mt-5">
             <div class="row mb-3">
               <div class="col-md-4">
-                <h3>{{ current_project_name }}</h3>
+                <h3>Project 1</h3>
               </div>
 
               <div class="col-md-4"></div>
@@ -334,29 +374,74 @@
                       <h5
                         class="d-flex justify-content-between align-items-center"
                       >
-                        <span>Chief editor</span>
+                        <span>Chief edidors</span>
                         <span>
-                          
+                          <button
+                            type="button"
+                            class="btn text-white"
+                            data-bs-toggle="modal"
+                            data-bs-target="#add_chief_editor"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              fill="currentColor"
+                              class="bi bi-plus-circle"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                              />
+                              <path
+                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+                              />
+                            </svg>
+                          </button>
                         </span>
                       </h5>
                     </div>
                     <div
+                      class="overflow-y-scroll p-5"
                       style="height: 250px; border-radius: 50px"
                     >
                       <div
                         class="modal-content rounded-4 mb-3 bg-body-tertiary p-3"
                       >
                         <div class="modal-header border-bottom-0">
-                          <h1 class="modal-title fs-5">{{ current_chief_editor }}</h1>
+                          <h1 class="modal-title fs-5">Chief edidor 1</h1>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                          ></button>
                         </div>
                         <div>
+                          <p>Transition name</p>
                           <p>Status</p>
 
-                          <p>Effectiveness</p>
+                          <p>Deadline</p>
                         </div>
                       </div>
 
-                      
+                      <div
+                        class="modal-content rounded-4 mb-3 bg-body-tertiary p-3"
+                      >
+                        <div class="modal-header border-bottom-0">
+                          <h1 class="modal-title fs-5">Chief edidor 2</h1>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div>
+                          <p>Transition name</p>
+                          <p>Status</p>
+
+                          <p>Deadline</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
