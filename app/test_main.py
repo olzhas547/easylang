@@ -10,26 +10,59 @@ import models
 
 @pytest.mark.anyio
 async def test_auth_valid_password():
-    request_invalid_password = 'username=manager_project&password=manager_project'
+    request_invalid_password = (
+        'username=manager_project&', 
+        'password=manager_project'
+    )
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response_not_existing_user = await ac.post("/login_form", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_invalid_password)
+        response_not_existing_user = await ac.post(
+            "/login_form",
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_invalid_password
+        )
     assert response_not_existing_user.status_code == 303
 
 @pytest.mark.anyio
 async def test_auth_invalid_login():
-    request_invalid_password = 'username=manareg_project&password=manager_project'
+    request_invalid_password = (
+        'username=manareg_project&', 
+        'password=manager_project'
+    )
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response_not_existing_user = await ac.post("/login_form", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_invalid_password)
+        response_not_existing_user = await ac.post(
+            "/login_form", 
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_invalid_password)
     assert response_not_existing_user.status_code == 302
-    assert response_not_existing_user.json() == {'detail': 'Incorrect login or password'}
+    assert response_not_existing_user.json() == {
+        'detail': 'Incorrect login or password'
+    }
 
 @pytest.mark.anyio
 async def test_auth_invalid_password():
-    request_invalid_password = 'username=manager_project&password=manareg_project'
+    request_invalid_password = (
+        'username=manager_project&',
+        'password=manareg_project'
+    )
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response_not_existing_user = await ac.post("/login_form", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_invalid_password)
+        response_not_existing_user = await ac.post(
+            "/login_form", 
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_invalid_password
+        )
     assert response_not_existing_user.status_code == 302
-    assert response_not_existing_user.json() == {'detail': 'Incorrect login or password'}
+    assert response_not_existing_user.json() == {
+        'detail': 'Incorrect login or password'
+    }
 
 def test_get_random_string_len_12():
     result = users.get_random_string(12)
@@ -48,7 +81,10 @@ async def test_get_user_by_login():
     '_id': ObjectId("643bf7db29a8f8dcc00a1bd9"),
     'login': 'manager_project',
     'username': 'manager_project',
-    'password': 'VgGdZKkexOUy$e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5',
+    'password': (
+        'VgGdZKkexOUy$',
+        'e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5'
+    ),
     'role': 'project_manager',
     'status': 'project_manager',
     'efficiency': 0,
@@ -61,11 +97,23 @@ async def test_get_user_by_invalid_login():
     assert result == None
 
 def test_validate_valid_password():
-    result = users.validate_password('manager_project', 'VgGdZKkexOUy$e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5')
+    result = users.validate_password(
+        'manager_project', 
+        (
+            'VgGdZKkexOUy$', 
+            'e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5'
+        )
+    )
     assert result == True
 
 def test_validate_invalid_password():
-    result = users.validate_password('manareg_project', 'VgGdZKkexOUy$e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5')
+    result = users.validate_password(
+        'manareg_project', 
+        (
+            'VgGdZKkexOUy$', 
+            'e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5'
+        )
+    )
     assert result == False
 
 @pytest.mark.anyio
@@ -85,19 +133,37 @@ def test_user_helper_valid():
         '_id': ObjectId("643bf7db29a8f8dcc00a1bd9"),
         'login': 'manager_project',
         'username': 'manager_project',
-        'password': 'VgGdZKkexOUy$e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5',
+        'password': (
+            'VgGdZKkexOUy$', 
+            'e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5'
+        ),
         'role': 'project_manager',
         'status': 'project_manager',
         'efficiency': 0,
         'is_active': True
     }
-    assert users.user_helper(user) == {'id': '643bf7db29a8f8dcc00a1bd9', 'login': 'manager_project', 'username': 'manager_project', 'password': 'VgGdZKkexOUy$e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5', 'role': 'project_manager', 'efficiency': 0, 'status': 'project_manager', 'is_active': True}
+    assert users.user_helper(user) == {
+        'id': '643bf7db29a8f8dcc00a1bd9', 
+        'login': 'manager_project', 
+        'username': 'manager_project', 
+        'password': (
+            'VgGdZKkexOUy$', 
+            'e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5'
+        ), 
+        'role': 'project_manager', 
+        'efficiency': 0, 
+        'status': 'project_manager', 
+        'is_active': True
+    }
 
 def test_user_helper_invalid():
     user = {
         '_id': ObjectId("643bf7db29a8f8dcc00a1bd9"),
         'login': 'manager_project',
-        'password': 'VgGdZKkexOUy$e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5',
+        'password': (
+            'VgGdZKkexOUy$', 
+            'e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5'
+        ),
         'role': 'project_manager',
         'status': 'project_manager',
         'efficiency': 0,
@@ -113,7 +179,12 @@ def test_token_helper_valid():
         "expires": "2023-04-30T19:36:40.236Z",
         'token_type': 'bearer'
     }
-    assert users.token_helper(token) == {'access_token': '643bf9e89d1255fd52d043ce', 'expires': '2023-04-30T19:36:40.236Z', 'token_type': 'bearer', 'user_id': '643bf7db29a8f8dcc00a1bd9'}
+    assert users.token_helper(token) == {
+        'access_token': '643bf9e89d1255fd52d043ce', 
+        'expires': '2023-04-30T19:36:40.236Z', 
+        'token_type': 'bearer', 
+        'user_id': '643bf7db29a8f8dcc00a1bd9'
+    }
 
 def test_token_helper_invalid():
     token = {
@@ -140,9 +211,19 @@ async def test_create_project():
     THEN
     Project created
     '''
-    request_create_project = 'project_name=Test+Project+4&deadline=2023-04-23&editors=Chief+Editor+2'
+    request_create_project = (
+        'project_name=Test+Project+4&', 
+        'deadline=2023-04-23&editors=Chief+Editor+2'
+    )
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response_create_project = await ac.post("/create_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_create_project)
+        response_create_project = await ac.post(
+            "/create_project", 
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_create_project
+        )
     assert response_create_project.status_code == 303
 
 @pytest.mark.anyio
@@ -156,9 +237,22 @@ async def test_create_project_invalid():
     Project not created. Chief editor not found
     '''
     with pytest.raises(KeyError):
-        request_create_project_invalid = 'project_name=Test+Project+4&deadline=2023-04-19'
-        async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-            await ac.post("/create_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_create_project_invalid)
+        request_create_project_invalid = (
+            'project_name=Test+Project+4&', 
+            'deadline=2023-04-19'
+        )
+        async with AsyncClient(
+            app=app, 
+            base_url="http://localhost:8000"
+        ) as ac:
+            await ac.post(
+                "/create_project", 
+                headers={
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'accept': 'application/json'
+                }, 
+                data=request_create_project_invalid
+            )
 
 @pytest.mark.anyio
 async def test_create_activity():
@@ -181,7 +275,9 @@ async def test_create_activity_invalid():
             'activity_name': 'initial_activity',
             'translators': None,
             'editors': 'editor',
-            'deadline': datetime.datetime(int('2022'), int('08'), int('05'), 0, 0),
+            'deadline': datetime.datetime(
+                int('2022'), int('08'), int('05'), 0, 0
+            ),
             'project_status': 'created',
             'completeness': 0
         }
@@ -198,9 +294,19 @@ async def test_edit_project():
     THEN
     Project edited
     '''
-    request_edit_project = 'project_name=Test+Project+4&deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+    request_edit_project = (
+        'project_name=Test+Project+4&deadline=2023-05-09&', 
+        'editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+    )
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response_edit_project = await ac.post("/edit_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_edit_project)
+        response_edit_project = await ac.post(
+            "/edit_project", 
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_edit_project
+        )
     assert response_edit_project.status_code == 303
 
 @pytest.mark.anyio
@@ -214,6 +320,19 @@ async def test_edit_project_invalid():
     Project not edited
     '''
     with pytest.raises(KeyError):
-        request_edit_project = 'deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
-        async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-            await ac.post("/edit_project", headers={'Content-Type': 'application/x-www-form-urlencoded', 'accept': 'application/json'}, data=request_edit_project)
+        request_edit_project = (
+            'deadline=2023-05-09&', 
+            'editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+        )
+        async with AsyncClient(
+            app=app, 
+            base_url="http://localhost:8000"
+        ) as ac:
+            await ac.post(
+                "/edit_project", 
+                headers={
+                    'Content-Type': 'application/x-www-form-urlencoded', 
+                    'accept': 'application/json'
+                }, 
+                data=request_edit_project
+            )

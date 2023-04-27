@@ -204,6 +204,7 @@
                 <h3>
                   Projects
                   <!-- Button trigger modal -->
+                  {% if not archive %}
                   <button
                     type="button"
                     class="btn"
@@ -226,6 +227,7 @@
                       />
                     </svg>
                   </button>
+                  {% endif %}
                 </h3>
               </div>
 
@@ -261,12 +263,14 @@
                     <div
                       class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0"
                     >
+                    {% if not archive %}
                       <button  type="button"
                               class="btn-1"
                               data-bs-toggle="modal"
                               data-bs-target="#exampleModal{{loop.index}}">
                         Edit the Project
                       </button>
+                      {% endif %}
                     </div>
                   </div>
                 </div>
@@ -277,6 +281,7 @@
         </div>
       </div>
     </main>
+    {% if num_of_pages|length > 1 %}
     <div class="pagination_section"> 
       {% if current_page != 1 %}
       <a href="/projects?page={{current_page-1}}"><< Previous</a> 
@@ -288,6 +293,7 @@
       <a  href="/projects?page={{current_page+1}}">Next >></a> 
       {% endif %}
      </div>
+     {% endif %}
     <!-- Modal -->
     <div
       class="modal fade"
@@ -326,8 +332,8 @@
                 <label for="exampleSelect" class="form-label"
                   >Assign a chief editor</label
                 >
-                <select required class="form-select" id="exampleSelect" name="editors">
-                  <!--option selected="">Choose a chief editor</option-->
+                <select required class="form-select" id="exampleSelect" name="editors" autocomplete="off">
+                  <option selected disabled hidden value="">Choose a chief editor</option>
                   {% for chief_editor in chief_editors_list %}
                   <option value="{{chief_editor}}">{{chief_editor}}</option>
                   {% endfor %}
@@ -422,22 +428,26 @@
                 <label for="recipient-name" class="col-form-label"
                 >Edit the project name:</label
                 >
-                <input required type="text" name="project_name" class="form-control" id="recipient-name" />
+                <input required type="text" value="{{project['project_name']}}" name="project_name" class="form-control" id="recipient-name" />
               </div>
               <div class="mb-3">
                 <label for="message-text" class="col-form-label"
                 >Edit deadline date:</label
                 >
-                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
+                <input required type="date" name="deadline" value="{{project['deadline']}}" class="form-control" id="recipient-name" />
               </div>
               <input hidden required type="text" name="_id" value="{{project['id']}}" class="form-control" id="recipient-name" />
               <div class="mb-3">
                 <label for="exampleSelect" class="form-label"
                 >Edit a chief editor</label
                 >
-                <select required class="form-select" id="exampleSelect" name="editors">
+                <select required class="form-select" id="exampleSelect" name="editors" autocomplete="off">
                   {% for chief_editor in chief_editors_list %}
+                  {% if chief_editor == project['chief_editor'] %}
+                  <option selected value="{{chief_editor}}">{{chief_editor}}</option>
+                  {% else %}
                   <option value="{{chief_editor}}">{{chief_editor}}</option>
+                  {% endif %}
                   {% endfor %}
                 </select>
               </div>

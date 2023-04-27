@@ -157,7 +157,11 @@
               <li class="breadcrumb-item">
                 <a
                   class="link-body-emphasis fw-semibold text-decoration-none"
+                  {% if status == 'finished' %}
+                  href="/projects?archive=True"
+                  {% else %}
                   href="/projects"
+                  {% endif %}
                   >Projects</a
                 >
               </li>

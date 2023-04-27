@@ -59,7 +59,12 @@ def get_random_string(length: int=12) -> str:
 def hash_password(password: str, salt: str = None):
     if salt is None:
         salt = get_random_string()
-    enc = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 100_000)
+    enc = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode(), 
+        salt.encode(), 
+        100_000
+    )
     return enc.hex()
 
 def validate_password(password: str, hashed_password: str) -> bool:
@@ -94,12 +99,23 @@ async def create_user(user: models.UserCreate):
     }
     user_id = await database.users_collection.insert_one(new_user)
     token = await create_user_token(str(user_id.inserted_id))
-    token_dict = {"access_token": token["access_token"], "expires": token["expires"]}
+    token_dict = {
+        "access_token": token["access_token"],
+        "expires": token["expires"]
+    }
 
-    return {**user.dict(), "id": user_id, "is_active": True, "token": token_dict}
+    return {
+        **user.dict(),
+        "id": user_id,
+        "is_active": True,
+        "token": token_dict
+    }
 
 async def set_status(status, user):
-    result = await database.users_collection.update_one({"login": user["login"]}, {"$set" : {"status": status}})
+    result = await database.users_collection.update_one(
+        {"login": user["login"]},
+        {"$set" : {"status": status}}
+    )
     return result.modified_count
 
 async def get_status(user) -> str:
@@ -137,7 +153,9 @@ async def get_current_user():
 async def get_current_user_from_cookie(request:Request):
     token=request.cookies.get(COOKIE_NAME)
     if token:
-        user = await database.users_collection.find_one({"_id": ObjectId(token[57:81])})
+        user = await database.users_collection.find_one(
+            {"_id": ObjectId(token[57:81])}
+        )
         return user
 
 
@@ -156,32 +174,58 @@ async def create_activity(activity: models.ActivityModel):
 
 
 async def set_time(activity: ObjectId, time: int):
-    result = await database.activities_collection.update_one({"_id": activity}, {"$set" : {"time": time}})
+    result = await database.activities_collection.update_one(
+        {"_id": activity},
+        {"$set" : {"time": time}}
+    )
     return result.modified_count
 
 async def set_activity_translator(activity: ObjectId, translator_id: ObjectId):
-    result = await database.activities_collection.update_one({"_id": activity}, {"$set" : {"translator": translator_id}})
+    result = await database.activities_collection.update_one(
+        {"_id": activity},
+        {"$set" : {"translator": translator_id}}
+    )
     return result.modified_count
 
 async def set_activity_editor(activity: ObjectId, editor_id: ObjectId):
-    result = await database.activities_collection.update_one({"_id": activity}, {"$set" : {"editor": editor_id}})
+    result = await database.activities_collection.update_one(
+        {"_id": activity},
+        {"$set" : {"editor": editor_id}}
+    )
     return result.modified_count
 
 async def edit_project(activity: ObjectId, activity_id: str):
-    result = await database.activities_collection.update_one({"_id": ObjectId(activity_id)}, {"$set" : {'project_name': activity.project_name, 'deadline': activity.deadline, 'editors': activity.editors}})
+    result = await database.activities_collection.update_one(
+        {"_id": ObjectId(activity_id)},
+        {"$set" : 
+            {
+                'project_name': activity.project_name,
+                'deadline': activity.deadline, 
+                'editors': activity.editors
+            }
+        }
+    )
     print(result.modified_count)
     return result.modified_count
 
-async def get_projects():
-    result = await database.activities_collection.distinct('project_name')
-    return result
+async def get_projects(status: str):
+    projects = []
+    async for project in database.activities_collection.find({
+        'activity_name': 'initial_activity', 'project_status': status}
+    ):
+        projects.append(project_helper(project))
+    return projects
 
 async def get_project(project_name: str):
-    result = await database.activities_collection.find_one({'project_name': project_name})
+    result = await database.activities_collection.find_one(
+        {'project_name': project_name}
+    )
     return project_helper(result)
 
 async def get_project_by_id(project_id: str):
-    result = await database.activities_collection.find_one({'_id': ObjectId(project_id)})
+    result = await database.activities_collection.find_one(
+        {'_id': ObjectId(project_id)}
+    )
     return project_helper(result)
 
 async def get_activities():
@@ -189,12 +233,16 @@ async def get_activities():
     return result
 
 async def get_activity(activity_name: str):
-    result = await database.activities_collection.find_one({'activity_name': activity_name})
+    result = await database.activities_collection.find_one(
+        {'activity_name': activity_name}
+    )
     return activity_helper(result)
 
 async def get_activities_of_the_project(project: str):
     activities_list = []
-    async for activity in database.activities_collection.find({'project_name': project}):
+    async for activity in database.activities_collection.find(
+        {'project_name': project}
+    ):
         activities_list.append(activity_helper(activity))
     return activities_list
 
