@@ -42,11 +42,11 @@ def project_helper(activity) -> dict:
 def activity_helper(activity) -> dict:
     return {
         'project_name': activity['project_name'],
-        'editor': str(activity['editor']),
+        'editor': str(activity['editors']),
         'status': 'placeholder',
         'deadline': 'placeholder',
         'activity_name': activity['activity_name'],
-        'translator': str(activity['translator']),
+        'translator': str(activity['translators']),
         'deadline': activity['deadline'],
         'project_status': activity['project_status'],
         'completeness': activity['completeness']
@@ -147,9 +147,6 @@ def verify_access_token(token: str, credentials_exception):
 
     return token_data
 
-async def get_current_user():
-    pass
-
 async def get_current_user_from_cookie(request:Request):
     token=request.cookies.get(COOKIE_NAME)
     if token:
@@ -232,6 +229,13 @@ async def get_activities():
     result = await database.activities_collection.distinct('activity_name')
     return result
 
+async def get_current_user():
+    pass
+
+async def get_project_names():
+    result = await database.activities_collection.distinct('project_name')
+    return result
+
 async def get_activity(activity_name: str):
     result = await database.activities_collection.find_one(
         {'activity_name': activity_name}
@@ -243,6 +247,7 @@ async def get_activities_of_the_project(project: str):
     async for activity in database.activities_collection.find(
         {'project_name': project}
     ):
+        print(activity)
         activities_list.append(activity_helper(activity))
     return activities_list
 

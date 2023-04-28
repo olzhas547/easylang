@@ -174,3 +174,12 @@ main {
   background-color: #49739d; 
   color: white; 
  }
+
+.incorrect_1{ 
+  font-size: larger; 
+  font-weight: 600; 
+  font-family: serif; 
+  color: red; 
+  text-shadow: 0.5px 0.1px black; 
+   
+}

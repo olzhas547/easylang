@@ -43,7 +43,8 @@ async def get_activities_of_the_project(request: Request, project: str):
 
 @router.get("/projects")
 async def show_projects(
-        request: Request, archive: bool = False, page: int = 1
+        request: Request, archive: bool = False, page: int = 1,
+        incorrect_name: bool = False, incorrect_time: bool = False,
     ):
     
     chief_editors_list = await users.get_list_of_users('chief_editor')
@@ -71,7 +72,9 @@ async def show_projects(
                 'translators_list': translators_list, 
                 'num_of_pages': num_of_pages, 
                 'current_page': page,
-                'archive': archive
+                'archive': archive,
+                'incorrect_time': incorrect_time,
+                'incorrect_name': incorrect_name,
             }
         )
     return RedirectResponse(
@@ -89,6 +92,10 @@ async def show_project(request: Request, project_id: str):
         projects = await users.get_projects('created')
     projects = sorted(projects, key=lambda d: d['deadline']) 
     user = await users.get_current_user_from_cookie(request)
+    
+    project_activities = await users.get_activities_of_the_project(project['project_name'])
+    project_activities = list(filter(lambda i: i['activity_name'] != 'initial_activity', project_activities))
+    
     if not user:
         return RedirectResponse(
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER
@@ -104,6 +111,7 @@ async def show_project(request: Request, project_id: str):
                 'current_project_name': project['project_name'], 
                 'current_chief_editor': project['chief_editor'],
                 'status': project['status'],
+                'project_activities': project_activities,
             }
         )
     return RedirectResponse(
@@ -114,8 +122,23 @@ async def show_project(request: Request, project_id: str):
 @router.post("/create_project")
 async def create_project(request: Request):
     result = await request.form()
+    
+    print(result['deadline'])
     project_name = result['project_name']
     deadline = result['deadline'].split('-')
+    if datetime.datetime.now() > datetime.datetime(
+        int(deadline[0]), int(deadline[1]), int(deadline[2]), 0, 0
+    ):
+        return RedirectResponse(
+            f'http://{url}/projects?incorrect_time=true', 
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+    project_names = await users.get_project_names()
+    if project_name in project_names:
+        return RedirectResponse(
+            f'http://{url}/projects?incorrect_name=true', 
+            status_code=status.HTTP_303_SEE_OTHER
+        )
     editors = result['editors']
     activity = {
         'activity_name': 'initial_activity',
@@ -139,6 +162,19 @@ async def edit_project(request: Request):
     project_name = result['project_name']
     deadline = result['deadline'].split('-')
     editors = result['editors']
+    if datetime.datetime.now() > datetime.datetime(
+        int(deadline[0]), int(deadline[1]), int(deadline[2]), 0, 0
+    ):
+        return RedirectResponse(
+            f'http://{url}/projects?incorrect_time=true', 
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+    project_names = await users.get_project_names()
+    if project_name in project_names:
+        return RedirectResponse(
+            f'http://{url}/projects?incorrect_name=true', 
+            status_code=status.HTTP_303_SEE_OTHER
+        )
     activity = {
         'activity_name': 'initial_activity',
         'project_name': project_name,

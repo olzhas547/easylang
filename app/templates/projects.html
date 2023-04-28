@@ -108,6 +108,26 @@
               
          
             </li>
+            <li class="border-top my-3"></li>
+            <li class="mb-1">
+            {% if not archive %}
+              <a
+                      href="/projects?archive=True"
+                      class="link-dark d-inline-flex text-decoration-none rounded"
+                      style="color: rgba(255, 255, 255, 0.85)"
+                      
+                      >Archive</a
+                    >
+             {% else %}
+             <a
+                      href="/projects"
+                      class="link-dark d-inline-flex text-decoration-none rounded"
+                      style="color: rgba(255, 255, 255, 0.85)"
+                      
+                      >Active</a
+                    >
+             {% endif %}
+              <li class="border-top my-3"></li>
           </ul>
         </div>
       </nav>
@@ -126,11 +146,20 @@
               class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-3"
             >
               <li class="breadcrumb-item">
+                {% if archive %}
                 <a
                   class="link-body-emphasis fw-semibold text-decoration-none"
-                  href="http://localhost:8000/projects"
+                  href="/projects?archive=True"
+                  >Archive projects</a
+                >
+                  {% else %}
+                  <a
+                  class="link-body-emphasis fw-semibold text-decoration-none"
+                  href="/projects"
                   >Projects</a
                 >
+                  
+                  {% endif %}
               </li>
               
             </ol>
@@ -201,6 +230,12 @@
           <div class="mt-5">
             <div class="row mb-3">
               <div class="col-md-4">
+              {% if incorrect_time %}
+              <p style="color:red" class="incorrect_1">Incorrect deadline time</p>
+              {% endif %}
+              {% if incorrect_name %}
+              <p style="color: red">The project name you have chosen is already taken</p>
+              {% endif %}
                 <h3>
                   Projects
                   <!-- Button trigger modal -->
