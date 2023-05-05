@@ -10,15 +10,16 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link href="../static/project_style.css" rel="stylesheet" />
-    <title>Project</title>
+    <link href="../static/activities_style.css" rel="stylesheet" />
+
+    <title>Activities</title>
   </head>
   <body>
     <main class="d-flex flex-nowrap">
-      <nav class="col-lg-2" style="background: #449ed1" id="nav">
+        <nav class="col-lg-2" style="background: #449ed1" id="nav">
         <div class="flex-shrink-0 p-3" style="width: 100%">
           <a
-            href="#"
+            href="/"
             class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom text-center"
           >
             <h3 class="text-white">EasyLang</h3>
@@ -51,43 +52,6 @@
               <button
                 class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
                 data-bs-toggle="collapse"
-                data-bs-target="#activities-collapse"
-                aria-expanded="false"
-              >
-                Activities
-              </button>
-              <div class="collapse" id="activities-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                {% for activity in project_activities %}
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{ activity }}</a
-                    >
-                  </li>
-                  {% endfor %}
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 2</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 3</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
-                data-bs-toggle="collapse"
                 data-bs-target="#chief-editors-collapse"
                 aria-expanded="false"
               >
@@ -98,9 +62,9 @@
                   {% for chief_editor in chief_editors_list %}
                   <li>
                     <a
-                      href="#"
+                      href="/chief_editor/{{chief_editor['id']}}"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{chief_editor}}</a
+                      >{{chief_editor['username']}}</a
                     >
                   </li>
                   {% endfor %}
@@ -122,18 +86,39 @@
                   {% for translator in translators_list %}
                   <li>
                     <a
-                      href="#"
+                      href="/translator/{{translator['id']}}"
                       class="link-dark d-inline-flex text-decoration-none rounded"
-                      >{{translator}}</a
+                      >{{translator['username']}}</a
                     >
                   </li>
                   {% endfor %}
                 </ul>
               </div>
             </li>
-
+            <li class="mb-1">
+              <button
+                class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                data-bs-toggle="collapse"
+                data-bs-target="#activities-collapse"
+                aria-expanded="false"
+              >
+                Activities
+              </button>
+              <div class="collapse" id="activities-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  {% for activity in project_activities %}
+                  <li>
+                    <a
+                      href="/activity/{{activity['id']}}"
+                      class="link-dark d-inline-flex text-decoration-none rounded"
+                      >{{activity['activity_name']}}</a
+                    >
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </li>
             <li class="border-top my-3"></li>
-
             <li class="mb-1">
               <button
                 class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
@@ -143,105 +128,84 @@
               >
                 Notifications
               </button>
+              
+         
             </li>
           </ul>
         </div>
       </nav>
+        <div class="b-example-divider b-example-vr"></div>
 
       <!-- Here starts content part -->
+      
 
       <div class="p-3 maining">
+        <form method="post" action="logout">
+          <button class="lg" type="Logout" name="Logout" value="Logout"> Log Out </button>
+        </form>
         <div class="container my-5">
           <nav aria-label="breadcrumb">
             <ol
               class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-3"
             >
               <li class="breadcrumb-item">
-              {% if status == 'finished' %}
                 <a
                   class="link-body-emphasis fw-semibold text-decoration-none"
-                  href="/projects?archive=True"
-                  >Archive projects</a
-                >
-                  {% else %}
-                  <a
-                  class="link-body-emphasis fw-semibold text-decoration-none"
-                  href="/projects"
+                  href="http://localhost:8000/projects"
                   >Projects</a
                 >
-                  
-                  {% endif %}
               </li>
-              <li class="breadcrumb-item" aria-current="page">{{ current_project_name }}</li>
+              <li class="breadcrumb-item">
+                <a
+                  class="link-body-emphasis fw-semibold text-decoration-none"
+                  href="http://localhost:8000/projects"
+                  >{{current_project_name}}</a
+                >
+              </li>
             </ol>
           </nav>
         </div>
 
-        <div class="container">
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg
-                  class="bd-placeholder-img card-img-top"
-                  width="100%"
-                  height="100"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-label="Placeholder: Thumbnail"
-                  preserveAspectRatio="xMidYMid slice"
-                  focusable="false"
-                ></svg>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg
-                  class="bd-placeholder-img card-img-top"
-                  width="100%"
-                  height="100"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-label="Placeholder: Thumbnail"
-                  preserveAspectRatio="xMidYMid slice"
-                  focusable="false"
-                ></svg>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg
-                  class="bd-placeholder-img card-img-top"
-                  width="100%"
-                  height="100"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-label="Placeholder: Thumbnail"
-                  preserveAspectRatio="xMidYMid slice"
-                  focusable="false"
-                ></svg>
-              </div>
-            </div>
+       
+           
 
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg
-                  class="bd-placeholder-img card-img-top"
-                  width="100%"
-                  height="100"
-                  xmlns="http://www.w3.org/2000/svg"
-                  role="img"
-                  aria-label="Placeholder: Thumbnail"
-                  preserveAspectRatio="xMidYMid slice"
-                  focusable="false"
-                ></svg>
-              </div>
-            </div>
-          </div>
 
           <div class="mt-5">
             <div class="row mb-3">
+            
               <div class="col-md-4">
-                <h3>{{ current_project_name }}</h3>
+                {% if incorrect_time %}
+                <p style="color:red" class="incorrect_1">Incorrect deadline time</p>
+                {% endif %}
+                {% if incorrect_name %}
+                <p style="color: red">The activities name you have chosen is already taken</p>
+                {% endif %}
+                <h3>
+                  Activities 
+                  <!-- Button trigger modal -->
+                  <button
+                    type="button"
+                    class="btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="currentColor"
+                      class="bi bi-plus-circle"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                      />
+                      <path
+                        d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+                      />
+                    </svg>
+                  </button>
+                </h3>
               </div>
 
               <div class="col-md-4"></div>
@@ -256,358 +220,459 @@
                 </form>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3 mt-4">
-              <div class="col-md-4">
-                <div class="col">
-                  <div class="card shadow-sm">
-                    <div class="card-header py-3 bg-warning text-white">
-                      <h5
-                        class="d-flex justify-content-between align-items-center"
-                      >
-                        <span>Activities</span>
-                        <span>
-                          <button
-                            type="button"
-                            class="btn text-white"
-                            data-bs-toggle="modal"
-                            data-bs-target="#add_activity"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              fill="currentColor"
-                              class="bi bi-plus-circle"
-                              viewBox="0 0 16 16"
-                            >
-                              <path
-                                d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
-                              />
-                              <path
-                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
-                              />
-                            </svg>
-                          </button>
-                        </span>
-                      </h5>
+          <div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+            {% for activity in project_activities %}
+              <div class="col">
+                <div class="card shadow-sm">
+                  <div class="modal-content rounded-4 shadow p-4">
+                    <div class="modal-header border-bottom-0">
+                      <h1 class="modal-title fs-5">{{activity['activity_name']}}</h1>
+                    </div>
+                    <div class="">
+                      <p>Translator: {{activity['translator']}}</p>
+                      <p>Status: {{activity['status']}}</p>
+
+                      <p>Deadline: {{activity['deadline']}}</p>
+                      <p>Completeness: {{activity['completeness']}}</p>
                     </div>
                     <div
-                      class="overflow-y-scroll p-5"
-                      style="height: 250px; border-radius: 50px"
+                      class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0"
                     >
-                    {% for activity in project_activities %}
-                      <div
-                        class="modal-content rounded-4 mb-3 bg-body-tertiary p-3"
-                      >
-                        <div class="modal-header border-bottom-0">
-                          <h1 class="modal-title fs-5">Activity 1</h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div>
-                          <p>Transition name</p>
-                          <p>Status</p>
 
-                          <p>Deadline</p>
-                        </div>
-                      </div>
-                      {% endfor %}
-                      <div
-                        class="modal-content rounded-4 mb-3 bg-body-tertiary p-3"
-                      >
-                        <div class="modal-header border-bottom-0">
-                          <h1 class="modal-title fs-5">Activity 2</h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div>
-                          <p>Transition name</p>
-                          <p>Status</p>
 
-                          <p>Deadline</p>
-                        </div>
-                      </div>
+                    
+                    <div></div>
+                    
+                      <button  type="button"
+                              class="btn-1"
+                              data-bs-toggle="modal"
+                              data-bs-target="#exampleModal1">
+                        Edit the activity
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <div class="col-md-4">
-                <div class="col">
-                  <div class="card shadow-sm">
-                    <div class="card-header py-3 bg-info text-white">
-                      <h5
-                        class="d-flex justify-content-between align-items-center"
-                      >
-                        <span>Chief editor</span>
-                        <span>
-                          
-                        </span>
-                      </h5>
-                    </div>
-                    <div
-                      style="height: 250px; border-radius: 50px"
-                    >
-                      <div
-                        class="modal-content rounded-4 mb-3 bg-body-tertiary p-3"
-                      >
-                        <div class="modal-header border-bottom-0">
-                          <h1 class="modal-title fs-5">{{ current_chief_editor }}</h1>
-                        </div>
-                        <div>
-                          <p>Status</p>
-
-                          <p>Effectiveness</p>
-                        </div>
-                      </div>
-
-                      
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="col">
-                  <div class="card shadow-sm">
-                    <div class="card-header py-3 bg-danger text-white">
-                      <h5
-                        class="d-flex justify-content-between align-items-center"
-                      >
-                        <span>Translators</span>
-                        <span>
-                          <button
-                            type="button"
-                            class="btn text-white"
-                            data-bs-toggle="modal"
-                            data-bs-target="#add_translator"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              fill="currentColor"
-                              class="bi bi-plus-circle"
-                              viewBox="0 0 16 16"
-                            >
-                              <path
-                                d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
-                              />
-                              <path
-                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
-                              />
-                            </svg>
-                          </button>
-                        </span>
-                      </h5>
-                    </div>
-                    <div
-                      class="overflow-y-scroll p-5"
-                      style="height: 250px; border-radius: 50px"
-                    >
-                      <div
-                        class="modal-content rounded-4 mb-3 bg-body-tertiary p-3"
-                      >
-                        <div class="modal-header border-bottom-0">
-                          <h1 class="modal-title fs-5">Translator 1</h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div>
-                          <p>Transition name</p>
-                          <p>Status</p>
-
-                          <p>Deadline</p>
-                        </div>
-                      </div>
-
-                      <div
-                        class="modal-content rounded-4 mb-3 bg-body-tertiary p-3"
-                      >
-                        <div class="modal-header border-bottom-0">
-                          <h1 class="modal-title fs-5">Translator 2</h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div>
-                          <p>Transition name</p>
-                          <p>Status</p>
-
-                          <p>Deadline</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {% endfor %}
             </div>
           </div>
         </div>
       </div>
+
+
+      
+      
     </main>
 
-    <div class="">
-      <!-- Modal add activity -->
-      <div
-        class="modal fade"
-        id="add_activity"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">
-                New activity
-              </h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <form action="create_activity" method="post">
-                <div class="mb-3">
-                  <label for="recipient-name" class="col-form-label"
-                    >Set the activity name:</label
-                  >
-                  <input type="text" class="form-control" id="recipient-name" />
-                </div>
-                <div class="mb-3">
-                  <label for="message-text" class="col-form-label"
-                    >Set deadline date:</label
-                  >
-                  <input type="date" class="form-control" id="recipient-name" />
-                </div>
 
-                <div class="mb-3">
-                  <label for="exampleSelect" class="form-label"
-                    >Assign a Translator</label
-                  >
-                  <select class="form-select" id="exampleSelect">
-                    <option selected="">Choose a translator</option>
-                    <option value="1">Translator 1</option>
-                    <option value="2">Translator 2</option>
-                    <option value="3">Translator 3</option>
-                  </select>
-                </div>
-                <div class="modal-footer">
-                <button class="svv" type="submit"> Save </button>
+
+
+
+
+
+
+<p class="translator">Translators</p>
+
+    <div class="read_2">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+        <div class="col">
+          <div class="card shadow-sm">
+            <div class="modal-content rounded-4 shadow p-4">
+              <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5">Project name</h1>
               </div>
-              </form>
+              <div class="">
+                <p>Chief edidor 1</p>
+                <p>Status</p>
+
+                <p>Deadline</p>
+              </div>
+              <div
+                class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0"
+              >
+
+
+              
+              <div></div>
+              
+                
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div
-        class="modal fade"
-        id="add_chief_editor"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">
-                Add chief editor
-              </h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="mb-3">
-                  <label for="recipient-name" class="col-form-label"
-                    >Full name:</label
-                  >
-                  <input type="text" class="form-control" id="recipient-name" />
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button type="button" class="btn btn-success">Save</button>
-            </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg
+              class="bd-placeholder-img card-img-top"
+              width="100%"
+              height="250"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-label="Placeholder: Thumbnail"
+              preserveAspectRatio="xMidYMid slice"
+              focusable="false"
+            ></svg>
           </div>
         </div>
-      </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg
+              class="bd-placeholder-img card-img-top"
+              width="100%"
+              height="250"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-label="Placeholder: Thumbnail"
+              preserveAspectRatio="xMidYMid slice"
+              focusable="false"
+            ></svg>
+          </div>
+        </div>
 
-      <div
-        class="modal fade"
-        id="add_translator"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">
-                Add translator
-              </h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="mb-3">
-                  <label for="recipient-name" class="col-form-label"
-                    >Full name:</label
-                  >
-                  <input type="text" class="form-control" id="recipient-name" />
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button type="button" class="btn btn-success">Save</button>
-            </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg
+              class="bd-placeholder-img card-img-top"
+              width="100%"
+              height="250"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-label="Placeholder: Thumbnail"
+              preserveAspectRatio="xMidYMid slice"
+              focusable="false"
+            ></svg>
           </div>
         </div>
       </div>
     </div>
-  </body>
+  </div>
+</div>
 
+
+
+
+
+
+<p class="translator">Chief editor</p>
+<div class="read_2">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+    <div class="col">
+      <div class="card shadow-sm">
+        <div class="modal-content rounded-4 shadow p-4">
+          <div class="modal-header border-bottom-0">
+            <h1 class="modal-title fs-5">{{current_chief_editor['username']}}</h1>
+          </div>
+          <div class="">
+            <p>Status: {{current_chief_editor['status']}}</p>
+            <p>Efficiency: {{current_chief_editor['efficiency']}}</p>
+          </div>
+          <div
+            class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0"
+          >
+
+
+          
+          <div></div>
+          
+            <button  type="button"
+                    class="btn-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal3">
+              Change the Chief Editor
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    
+
+    <!-- Modal -->
+    <div
+    class="modal fade"
+    id="exampleModal3"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Chief Editor </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form action="change_chief_editor" method="post">
+           
+              <input hidden required type="text" name="_id" value="{{project_id}}" class="form-control" id="recipient-name" />
+
+            <div class="mb-3">
+              <label for="exampleSelect" class="form-label"
+                >Change a chief editor</label
+              >
+              <select required class="form-select" id="exampleSelect" name="editor">
+                <!--option selected="">Choose a chief editor</option-->
+                {% for chief_editor in chief_editors_list %}
+                
+                <option value="{{chief_editor['id']}}">{{chief_editor['username']}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-footer">
+          <button class="svv" type="submit"> Save </button>
+        </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">New Activities </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form action="create_activity" method="post">
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label"
+                  >Set the activities name:</label
+                >
+                <input required type="text" name="activity_name" class="form-control" id="recipient-name" />
+              </div>
+              <input required hidden type="text" name="project_name" class="form-control" id="recipient-name" value="{{current_project_name}}"/>
+              <input required hidden type="text" name="current_chief_editor" class="form-control" id="recipient-name" value="{{current_chief_editor['id']}}"/>
+              <input required hidden type="text" name="project_id" class="form-control" id="recipient-name" value="{{project_id}}"/>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label"
+                  >Set deadline date:</label
+                >
+                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
+              </div>
+
+              <div class="mb-3">
+                <label for="exampleSelect" class="form-label"
+                  >Assign a translator</label
+                >
+                
+                <select required class="form-select" id="exampleSelect" name="translator" autocomplete="off">
+                  <option selected disabled hidden value="">Choose a translator</option>
+                  {% for translator in translators_list %}
+                  <option value="{{translator['id']}}">{{translator['username']}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="modal-footer">
+            <button class="svv" type="submit"> Save </button>
+          </div>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div
+    class="modal fade"
+    id="exampleModal2"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">New Translator </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form action="create_project" method="post">
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label"
+                >Set the translator name:</label
+              >
+              <input required type="text" name="project_name" class="form-control" id="recipient-name" />
+            </div>
+            <div class="mb-3">
+              <label for="exampleSelect" class="form-label"
+                >Set the status</label
+              >
+              <select required class="form-select" id="exampleSelect" name="editors">
+                {% for chief_editor in chief_editors_list %}
+                <option value="{{chief_editor}}">{{status}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="exampleSelect" class="form-label"
+                >Assign a translator</label
+              >
+              <select required class="form-select" id="exampleSelect" name="editor">
+                {% for translator in translators_list %}
+                <option value="{{chief_editor}}">{{translator}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-footer">
+          <button class="svv" type="submit"> Save </button>
+        </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+    <div
+            class="modal fade"
+            id="exampleModal1"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel1">Edit Activities</h1>
+            <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form action="edit_activity" method="post">
+            <input required hidden type="text" name="project_name" class="form-control" id="recipient-name" value="{{current_project_name}}"/>
+            <input required hidden type="text" name="current_chief_editor" class="form-control" id="recipient-name" value="{{current_chief_editor}}"/>
+            <input required hidden type="text" name="project_id" class="form-control" id="recipient-name" value="{{project_id}}"/>
+            <input required hidden type="text" name="_id" class="form-control" id="recipient-name" value="{{_id}}"/>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label"
+                >Edit the Activities name:</label
+                >
+                <input required type="text" name="activity_name" class="form-control" id="recipient-name" />
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label"
+                >Edit deadline date:</label
+                >
+                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
+              </div>
+              <div class="mb-3">
+                <label for="exampleSelect" class="form-label"
+                  >Change a translator</label
+                >
+                <select required class="form-select" id="exampleSelect" name="translator">
+                  {% for translator in translators_list %}
+                  <option value="{{translator['id']}}">{{translator['username']}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              
+              <div class="modal-footer">
+                <button class="svv" type="submit"> Save </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+
+         <div
+            class="modal fade"
+            id="exampleModal1"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel1">Edit Activities</h1>
+            <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form action="edit_project" method="post">
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label"
+                >Edit the Activities name:</label
+                >
+                <input required type="text" name="project_name" class="form-control" id="recipient-name" />
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label"
+                >Edit deadline date:</label
+                >
+                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
+              </div>
+              <div class="mb-3">
+                <label for="exampleSelect" class="form-label"
+                  >Change a translater</label
+                >
+                <select required class="form-select" id="exampleSelect" name="editors">
+                  {% for chief_editor in chief_editors_list %}
+                  <option value="{{chief_editor}}">{{chief_editor}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              
+              <div class="modal-footer">
+                <button class="svv" type="submit"> Save </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+        
+        
+    
+  </body>
+ 
   <script
     src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
     crossorigin="anonymous"
-  ></script>
+  >
+  </script>
 </html>

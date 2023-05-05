@@ -18,7 +18,7 @@
       <nav class="col-lg-2" style="background: #449ed1" id="nav">
         <div class="flex-shrink-0 p-3" style="width: 100%">
           <a
-            href="/"
+            href="#"
             class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom text-center"
           >
             <h3 class="text-white">EasyLang</h3>
@@ -35,15 +35,62 @@
               </button>
               <div class="collapse" id="projects-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for project in all_projects %}
                   <li>
                     <a
-                      href="/project/{{ project['id'] }}"
+                      href="#"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{ project['project_name'] }}</a
+                      >Project 1</a
                     >
                   </li>
-                  {% endfor %}
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Project 2</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Project 3</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="mb-1">
+              <button
+                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
+                data-bs-toggle="collapse"
+                data-bs-target="#activities-collapse"
+                aria-expanded="false"
+              >
+                Activities
+              </button>
+              <div class="collapse" id="activities-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Activity 1</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Activity 2</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Activity 3</a
+                    >
+                  </li>
                 </ul>
               </div>
             </li>
@@ -58,15 +105,27 @@
               </button>
               <div class="collapse" id="chief-editors-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for chief_editor in chief_editors_list %}
                   <li>
                     <a
-                      href="/chief_editor/{{chief_editor['id']}}"
+                      href="#"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{chief_editor['username']}}</a
+                      >Chief editor 1</a
                     >
                   </li>
-                  {% endfor %}
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Chief editor 2</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                      >Chief editor 3</a
+                    >
+                  </li>
                 </ul>
               </div>
             </li>
@@ -82,19 +141,33 @@
               </button>
               <div class="collapse" id="translators-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for translator in translators_list %}
                   <li>
                     <a
-                      href="/translator/{{translator['id']}}"
+                      href="#"
                       class="link-dark d-inline-flex text-decoration-none rounded"
-                      >{{translator['username']}}</a
+                      >Translator 1</a
                     >
                   </li>
-                  {% endfor %}
+                  <li>
+                    <a
+                      href="#"
+                      class="link-dark d-inline-flex text-decoration-none rounded"
+                      >Translators</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="link-dark d-inline-flex text-decoration-none rounded"
+                      >Translators</a
+                    >
+                  </li>
                 </ul>
               </div>
             </li>
+
             <li class="border-top my-3"></li>
+
             <li class="mb-1">
               <button
                 class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
@@ -104,10 +177,7 @@
               >
                 Notifications
               </button>
-              
-         
             </li>
-            
           </ul>
         </div>
       </nav>
@@ -115,16 +185,23 @@
       <!-- Here starts content part -->
 
       <div class="p-3 maining">
-      <form method="post" action="logout">
-          <button class="lg" type="Logout" name="Logout" value="Logout"> Log Out </button>
-        </form>
         <div class="container my-5">
           <nav aria-label="breadcrumb">
             <ol
               class="breadcrumb breadcrumb-chevron p-3 bg-body-secondary rounded-3"
             >
-              <li class="breadcrumb-item">Chief editors</li>
-              <li class="breadcrumb-item" aria-current="page">Chief editor name</li>
+              <li class="breadcrumb-item">
+                <a
+                  class="link-body-emphasis fw-semibold text-decoration-none"
+                  href="#"
+                  >Projects</a
+                >
+              </li>
+              <li class="breadcrumb-item" aria-current="page">Project 1</li>
+
+              <li class="breadcrumb-item active" aria-current="page">
+                Activity 1
+              </li>
             </ol>
           </nav>
         </div>

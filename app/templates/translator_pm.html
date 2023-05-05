@@ -10,23 +10,15 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link href="./style.css" rel="stylesheet" />
+    <link href="../static/project_style.css" rel="stylesheet" />
     <title>Translator</title>
   </head>
   <body>
-    <header>
-      <form method="post" action="process.php">
-        <button type="Logout" name="Logout" value="Logout"> <a href="C:\Users\Леново\Downloads\registration_page.html">
-          <img src="C:\Users\Леново\Downloads\log-out-transformed.png" alt="Logout logo" width="40px" height="40px" style="position:fixed; top: 0; right: 0;">
-        </a>
-        </button>
-      </form>
-    </header>
     <main class="d-flex flex-nowrap">
       <nav class="col-lg-2" style="background: #449ed1" id="nav">
         <div class="flex-shrink-0 p-3" style="width: 100%">
           <a
-            href="#"
+            href="/"
             class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom text-center"
           >
             <h3 class="text-white">EasyLang</h3>
@@ -43,62 +35,15 @@
               </button>
               <div class="collapse" id="projects-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  {% for project in all_projects %}
                   <li>
                     <a
-                      href="#"
+                      href="/project/{{ project['id'] }}"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Project 1</a
+                      >{{ project['project_name'] }}</a
                     >
                   </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Project 2</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Project 3</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#activities-collapse"
-                aria-expanded="false"
-              >
-                Activities
-              </button>
-              <div class="collapse" id="activities-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 1</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 2</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 3</a
-                    >
-                  </li>
+                  {% endfor %}
                 </ul>
               </div>
             </li>
@@ -113,27 +58,15 @@
               </button>
               <div class="collapse" id="chief-editors-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  {% for chief_editor in chief_editors_list %}
                   <li>
                     <a
-                      href="#"
+                      href="/chief_editor/{{chief_editor['id']}}"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Chief editor 1</a
+                      >{{chief_editor['username']}}</a
                     >
                   </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Chief editor 2</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Chief editor 3</a
-                    >
-                  </li>
+                  {% endfor %}
                 </ul>
               </div>
             </li>
@@ -149,33 +82,19 @@
               </button>
               <div class="collapse" id="translators-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                  {% for translator in translators_list %}
                   <li>
                     <a
-                      href="#"
+                      href="/translator/{{translator['id']}}"
                       class="link-dark d-inline-flex text-decoration-none rounded"
-                      >Translator 1</a
+                      >{{translator['username']}}</a
                     >
                   </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-dark d-inline-flex text-decoration-none rounded"
-                      >Translators</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-dark d-inline-flex text-decoration-none rounded"
-                      >Translators</a
-                    >
-                  </li>
+                  {% endfor %}
                 </ul>
               </div>
             </li>
-
             <li class="border-top my-3"></li>
-
             <li class="mb-1">
               <button
                 class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
@@ -193,23 +112,16 @@
       <!-- Here starts content part -->
 
       <div class="p-3 maining">
+      <form method="post" action="logout">
+          <button class="lg" type="Logout" name="Logout" value="Logout"> Log Out </button>
+        </form>
         <div class="container my-5">
           <nav aria-label="breadcrumb">
             <ol
               class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-3"
             >
-              <li class="breadcrumb-item">
-                <a
-                  class="link-body-emphasis fw-semibold text-decoration-none"
-                  href="#"
-                  >Projects</a
-                >
-              </li>
-              <li class="breadcrumb-item" aria-current="page">Project 1</li>
+              <li class="breadcrumb-item" aria-current="page">Translator 1</li>
 
-              <li class="breadcrumb-item active" aria-current="page">
-                Activity 1
-              </li>
             </ol>
           </nav>
         </div>
@@ -278,7 +190,7 @@
           <div class="mt-5">
             <div class="row mb-3">
               <div class="col-md-4">
-                <h3>Translator 1</h3>
+                <h3>{{ current_translator }}</h3>
               </div>
 
               <div class="col-md-4"></div>

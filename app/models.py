@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 class ProjectCreate(BaseModel):
     project_name: str
     deadline: str
-    editors: str
+    editor: str
 
 class UserCreate(BaseModel):
     login: str
@@ -40,10 +40,11 @@ class ActivityModel(BaseModel):
     activity_name: str
     project_name: str
     translators: str | None
-    editors: str
+    editor: str
     deadline: datetime
     project_status: str
     completeness: float
+    status: str
 
 class LoginForm(BaseModel):
     login: str

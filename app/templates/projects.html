@@ -19,7 +19,7 @@
       <nav class="col-lg-2" style="background: #449ed1" id="nav">
         <div class="flex-shrink-0 p-3" style="width: 100%">
           <a
-            href="#"
+            href="/"
             class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom text-center"
           >
             <h3 class="text-white">EasyLang</h3>
@@ -62,9 +62,9 @@
                   {% for chief_editor in chief_editors_list %}
                   <li>
                     <a
-                      href="#"
+                      href="/chief_editor/{{chief_editor['id']}}"
                       class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{chief_editor}}</a
+                      >{{chief_editor['username']}}</a
                     >
                   </li>
                   {% endfor %}
@@ -86,9 +86,9 @@
                   {% for translator in translators_list %}
                   <li>
                     <a
-                      href="#"
+                      href="/translator/{{translator['id']}}"
                       class="link-dark d-inline-flex text-decoration-none rounded"
-                      >{{translator}}</a
+                      >{{translator['username']}}</a
                     >
                   </li>
                   {% endfor %}
@@ -290,7 +290,7 @@
                       <h1 class="modal-title fs-5">{{ project['project_name'] }}</h1>
                     </div>
                     <div class="">
-                      <p>{{ project['chief_editor'] }}</p>
+                      <p>{{ project['editor'] }}</p>
                       <p>{{ project['status'] }}</p>
 
                       <p>{{ project['deadline'] }}</p>
@@ -367,10 +367,10 @@
                 <label for="exampleSelect" class="form-label"
                   >Assign a chief editor</label
                 >
-                <select required class="form-select" id="exampleSelect" name="editors" autocomplete="off">
+                <select required class="form-select" id="exampleSelect" name="editor" autocomplete="off">
                   <option selected disabled hidden value="">Choose a chief editor</option>
                   {% for chief_editor in chief_editors_list %}
-                  <option value="{{chief_editor}}">{{chief_editor}}</option>
+                  <option value="{{chief_editor['id']}}">{{chief_editor['username']}}</option>
                   {% endfor %}
                 </select>
               </div>
@@ -419,10 +419,10 @@
                 <label for="exampleSelect" class="form-label"
                   >Assign a chief editor</label
                 >
-                <select required class="form-select" id="exampleSelect" name="editors">
+                <select required class="form-select" id="exampleSelect" name="editor">
                   <!--option selected="">Choose a chief editor</option-->
                   {% for chief_editor in chief_editors_list %}
-                  <option value="{{chief_editor}}">{{chief_editor}}</option>
+                  <option value="{{editor}}">{{editor}}</option>
                   {% endfor %}
                 </select>
               </div>
@@ -469,19 +469,20 @@
                 <label for="message-text" class="col-form-label"
                 >Edit deadline date:</label
                 >
-                <input required type="date" name="deadline" value="{{project['deadline']}}" class="form-control" id="recipient-name" />
+                <input required type="date" name="deadline" value="{{project['deadline'].split(' ')[0]}}" class="form-control" id="recipient-name" />
               </div>
               <input hidden required type="text" name="_id" value="{{project['id']}}" class="form-control" id="recipient-name" />
               <div class="mb-3">
                 <label for="exampleSelect" class="form-label"
                 >Edit a chief editor</label
                 >
-                <select required class="form-select" id="exampleSelect" name="editors" autocomplete="off">
+                <select required class="form-select" id="exampleSelect" name="editor" autocomplete="off">
+                
                   {% for chief_editor in chief_editors_list %}
-                  {% if chief_editor == project['chief_editor'] %}
-                  <option selected value="{{chief_editor}}">{{chief_editor}}</option>
+                  {% if chief_editor['username'] == project['editor'] %}
+                  <option selected value="{{chief_editor['id']}}">{{chief_editor['username']}}</option>
                   {% else %}
-                  <option value="{{chief_editor}}">{{chief_editor}}</option>
+                  <option value="{{chief_editor['id']}}">{{chief_editor['username']}}</option>
                   {% endif %}
                   {% endfor %}
                 </select>

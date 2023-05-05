@@ -1,7 +1,6 @@
 import hashlib
 import random
 import string
-from fastapi.security import OAuth2PasswordBearer
 from fastapi import  Request
 from bson.objectid import ObjectId
 from datetime import datetime, timedelta
@@ -33,7 +32,7 @@ def token_helper(token) -> dict:
 def project_helper(activity) -> dict:
     return {
         'project_name': activity['project_name'],
-        'chief_editor': str(activity['editors']),
+        'editor': str(activity['editor']),
         'status': activity['project_status'],
         'deadline': str(activity['deadline']),
         'id': str(activity['_id'])
@@ -41,10 +40,10 @@ def project_helper(activity) -> dict:
 
 def activity_helper(activity) -> dict:
     return {
+        '_id': str(activity['_id']),
         'project_name': activity['project_name'],
-        'editor': str(activity['editors']),
-        'status': 'placeholder',
-        'deadline': 'placeholder',
+        'editor': str(activity['editor']),
+        'status': activity['status'],
         'activity_name': activity['activity_name'],
         'translator': str(activity['translators']),
         'deadline': activity['deadline'],
@@ -161,10 +160,11 @@ async def create_activity(activity: models.ActivityModel):
         'activity_name': activity.activity_name,
         'project_name': activity.project_name,
         'translators': activity.translators,
-        'editors': activity.editors,
+        'editor': activity.editor,
         'deadline': activity.deadline,
         'project_status': activity.project_status,
-        'completeness': activity.completeness
+        'completeness': activity.completeness,
+        'status': activity.status
     }
     activity_id = await database.activities_collection.insert_one(new_activity)
     return str(activity_id.inserted_id)
@@ -191,18 +191,30 @@ async def set_activity_editor(activity: ObjectId, editor_id: ObjectId):
     )
     return result.modified_count
 
-async def edit_project(activity: ObjectId, activity_id: str):
+async def edit_project(activity: models.ActivityModel, activity_id: str):
     result = await database.activities_collection.update_one(
         {"_id": ObjectId(activity_id)},
         {"$set" : 
             {
                 'project_name': activity.project_name,
                 'deadline': activity.deadline, 
-                'editors': activity.editors
+                'editor': activity.editor
             }
         }
     )
-    print(result.modified_count)
+    return result.modified_count
+
+async def edit_activity(activity: models.ActivityModel, activity_id: str):
+    result = await database.activities_collection.update_one(
+        {"_id": ObjectId(activity_id)},
+        {"$set" : 
+            {
+                'acitivty_name': activity.activity_name,
+                'deadline': activity.deadline, 
+                'translator': activity.translator
+            }
+        }
+    )
     return result.modified_count
 
 async def get_projects(status: str):
@@ -247,12 +259,17 @@ async def get_activities_of_the_project(project: str):
     async for activity in database.activities_collection.find(
         {'project_name': project}
     ):
-        print(activity)
         activities_list.append(activity_helper(activity))
     return activities_list
 
 async def get_list_of_users(role: str):
     users = []
     async for user in database.users_collection.find({'role': role}):
-        users.append(user_helper(user)['username'])
+        users.append({'username': user_helper(user)['username'], 'id': user_helper(user)['id']})
     return users
+
+async def get_user_by_id(user_id: str):
+    result = await database.users_collection.find_one(
+        {'_id': ObjectId(user_id)}
+    )
+    return user_helper(result)
