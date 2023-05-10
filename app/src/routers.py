@@ -52,7 +52,6 @@ async def get_activities_of_the_project(request: Request, project: str):
     return await users.get_activities_of_the_project(project)
 
 
-###############################################################################
 
 @router.get("/projects")
 async def show_projects(
@@ -98,7 +97,7 @@ async def show_projects(
     )
 
 @router.get("/project/{project_id}")
-async def show_project(request: Request, project_id: str):
+async def show_project(request: Request, project_id: str, incorrect_time: bool = False):
     chief_editors_list = await users.get_list_of_users('chief_editor')
     translators_list = await users.get_list_of_users('translator')
     project =  await users.get_project_by_id(project_id)
@@ -108,14 +107,19 @@ async def show_project(request: Request, project_id: str):
         projects = await users.get_projects('created')
     projects = sorted(projects, key=lambda d: d['deadline']) 
     user = await users.get_current_user_from_cookie(request)
-    
-    project_activities = await users.get_activities_of_the_project(project['project_name'])
-    project_activities = list(filter(lambda i: i['activity_name'] != 'initial_activity', project_activities))
+    project_activities = list(
+        filter(
+            lambda i: i['activity_name'] != 'initial_activity', 
+            await users.get_activities_of_the_project(project['project_name'])
+        )
+    )
+    project_translators = []
     for project_activity in project_activities:
         result = await users.get_user_by_id(project_activity['translator'])
         project_activity['translator'] = result['username']
+        if result not in project_translators:
+            project_translators.append(result)
     current_chief_editor = await users.get_user_by_id(project['editor'])
-    print(project_activities)
     if not user:
         return RedirectResponse(
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER
@@ -133,6 +137,8 @@ async def show_project(request: Request, project_id: str):
                 'status': project['status'],
                 'project_activities': project_activities,
                 'project_id': project_id,
+                'project_translators': project_translators,
+                'incorrect_time': incorrect_time,
             }
         )
     return RedirectResponse(
@@ -210,14 +216,13 @@ async def edit_project(request: Request):
         'completeness': 0,
         'status': 'finished'
     }
-    approve = await users.edit_project(
+    await users.edit_project(
         models.ActivityModel(**activity), result['_id']
     )
     return RedirectResponse(
         f'http://{url}/projects', status_code=status.HTTP_303_SEE_OTHER
     )
-    
-###############################################################################
+
 
 @router.get("/users_list")
 async def users_list_in_bd():
@@ -258,6 +263,11 @@ async def app_create_user(user: models.UserCreate):
 
 @router.get('/login', response_class=HTMLResponse)
 async def login(request: Request, not_valid: bool = False):
+    user = await users.get_current_user_from_cookie(request)
+    if user:
+        return RedirectResponse(
+            f'http://{url}/', status_code=status.HTTP_303_SEE_OTHER
+        )
     return templates.TemplateResponse(
         'registration_page.html', {'request': request, 'not_valid': not_valid}
     )
@@ -305,12 +315,13 @@ async def auth(
     )
     return response
 
-@router.get("/me", response_model=models.UserBase)
+@router.get("/me")
 async def read_users_me(request: Request):
     user = await users.get_current_user_from_cookie(request)
     if user['role'] == 'translator':
+        activities = await users.get_user_activities(str(user['_id']), 'translators')
         return templates.TemplateResponse(
-            'translator.html', {'request': request}
+            'translator.html', {'request': request, 'activities': activities}
         )
     if user['role'] == 'chief_editor':
         return templates.TemplateResponse(
@@ -357,8 +368,14 @@ async def create_activity(request: Request):
 @router.post("/project/edit_activity")
 async def edit_activity(request: Request):
     form = await request.form()
-    print(form)
     deadline = form['deadline'].split('-')
+    if datetime.datetime.now() > datetime.datetime(
+        int(deadline[0]), int(deadline[1]), int(deadline[2]), 0, 0
+    ):
+        return RedirectResponse(
+            f"http://{url}/project/{form['project_id']}?incorrect_time=true", 
+            status_code=status.HTTP_303_SEE_OTHER
+        )
     activity = {
         'activity_name': form['activity_name'],
         'project_name': form['project_name'],
@@ -369,9 +386,13 @@ async def edit_activity(request: Request):
         ),
         'project_status': 'in work',
         'completeness': 0.0,
-        'status': 'created'
+        'status': 'created',
     }
-    await users.edit_activity(models.ActivityModel(**activity))
+    result = await users.edit_activity(
+        models.ActivityModel(**activity), 
+        form['activity_id']
+    )
+    print(result)
     return RedirectResponse(
         f"http://{url}/project/{form['project_id']}", 
         status_code=status.HTTP_303_SEE_OTHER
@@ -456,6 +477,7 @@ async def show_translator(request: Request, translator_id: str):
     translators_list = await users.get_list_of_users('translator')
     projects = await users.get_projects('created')
     projects = sorted(projects, key=lambda d: d['deadline'])
+    activities = await users.get_user_activities(translator_id, 'translators')
     user = await users.get_current_user_from_cookie(request)
     if not user:
         return RedirectResponse(
@@ -470,6 +492,7 @@ async def show_translator(request: Request, translator_id: str):
                 'all_projects': projects, 
                 'translators_list': translators_list,
                 'current_translator': current_translator['username'],
+                'activities': activities,
             }
         )
     return RedirectResponse(
@@ -483,6 +506,8 @@ async def show_chief_editor(request: Request, chief_editor_id: str):
     translators_list = await users.get_list_of_users('translator')
     projects = await users.get_projects('created')
     projects = sorted(projects, key=lambda d: d['deadline'])
+    activities = await users.get_user_activities(chief_editor_id, 'editor')
+    print(activities)
     user = await users.get_current_user_from_cookie(request)
     if not user:
         return RedirectResponse(

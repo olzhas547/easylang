@@ -121,9 +121,6 @@ async def get_status(user) -> str:
     result = await database.users_collection.find_one({"login": user["login"]})
     return user_helper(result)["status"]
 
-
-#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_form")
-
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
@@ -209,9 +206,9 @@ async def edit_activity(activity: models.ActivityModel, activity_id: str):
         {"_id": ObjectId(activity_id)},
         {"$set" : 
             {
-                'acitivty_name': activity.activity_name,
+                'activity_name': activity.activity_name,
                 'deadline': activity.deadline, 
-                'translator': activity.translator
+                'translators': activity.translators
             }
         }
     )
@@ -265,7 +262,12 @@ async def get_activities_of_the_project(project: str):
 async def get_list_of_users(role: str):
     users = []
     async for user in database.users_collection.find({'role': role}):
-        users.append({'username': user_helper(user)['username'], 'id': user_helper(user)['id']})
+        users.append(
+            {
+                'username': user_helper(user)['username'],
+                'id': user_helper(user)['id']
+            }
+        )
     return users
 
 async def get_user_by_id(user_id: str):
@@ -273,3 +275,11 @@ async def get_user_by_id(user_id: str):
         {'_id': ObjectId(user_id)}
     )
     return user_helper(result)
+
+async def get_user_activities(user_id: str, user_role: str):
+    activities_list = []
+    async for activity in database.activities_collection.find(
+        {user_role: user_id}
+    ):
+        activities_list.append(activity_helper(activity))
+    return activities_list

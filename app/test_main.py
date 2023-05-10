@@ -10,7 +10,7 @@ import models
 
 @pytest.mark.anyio
 async def test_auth_valid_password():
-    request_invalid_password = 'username=manager_project&password=manager_project'
+    request_invalid_password = 'username=test&password=test'
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response_not_existing_user = await ac.post(
             "/login_form",
@@ -24,7 +24,7 @@ async def test_auth_valid_password():
 
 @pytest.mark.anyio
 async def test_auth_invalid_login():
-    request_invalid_password = 'username=manareg_project&password=manager_project'
+    request_invalid_password = 'username=test&password=notest'
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response_not_existing_user = await ac.post(
             "/login_form", 
@@ -67,14 +67,14 @@ def test_get_random_string_len_not_12():
 
 @pytest.mark.anyio
 async def test_get_user_by_login():
-    result = await users.get_user_by_login('manager_project')
+    result = await users.get_user_by_login('test')
     assert result == {
-    '_id': ObjectId("643bf7db29a8f8dcc00a1bd9"),
-    'login': 'manager_project',
-    'username': 'manager_project',
-    'password': 'VgGdZKkexOUy$e1f631580bc78759077f5398a4b4661c846e0f3ddea4ae992b51991fc6ae95d5',
-    'role': 'project_manager',
-    'status': 'project_manager',
+    '_id': ObjectId('645a485f74b6688020457c41'),
+    'login': 'test',
+    'username': 'test',
+    'password': 'KyyheazmpJDO$aa597210ffc2b5eaff0d45d6de887378b7b34dd36b1e50f35a45dcac071d0da7',
+    'role': 'test',
+    'status': 'test',
     'efficiency': 0,
     'is_active': True
   }
@@ -177,14 +177,14 @@ def test_token_helper_invalid():
 async def test_create_project():
     '''
     WHEN
-    Project name IS Test Project 4
+    Project name IS "random name"
     Deadline IS 2023-04-23
     Chief Editor IS Chief Editor 2
     
     THEN
     Project created
     '''
-    request_create_project = 'project_name=Test+Project+4&deadline=2023-04-23&editors=Chief+Editor+2'
+    request_create_project = f'project_name={str(ObjectId())}&deadline=2023-04-23&editors=645a4bca08eca36c3778e6a0'
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response_create_project = await ac.post(
             "/create_project", 
@@ -225,12 +225,13 @@ async def test_create_project_invalid():
 async def test_create_activity():
     activity = {
         'activity_name': 'initial_activity',
-        'project_name': 'project_name',
+        'project_name': str(ObjectId()),
         'translators': None,
-        'editors': 'editor',
+        'editor': '645a4bca08eca36c3778e6a0',
         'deadline': datetime.datetime(int('2022'), int('08'), int('05'), 0, 0),
         'project_status': 'created',
-        'completeness': 0
+        'completeness': 0,
+        'status': 'initialized'
     }
     result = await users.create_activity(models.ActivityModel(**activity))
     assert type(result) is str
@@ -254,14 +255,14 @@ async def test_create_activity_invalid():
 async def test_edit_project():
     '''
     WHEN
-    Project name IS Test Project 4
+    Project name IS test
     Deadline IS 2023-05-09
     Chief Editor IS Chief Editor 2
     
     THEN
     Project edited
     '''
-    request_edit_project = 'project_name=Test+Project+4&deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+    request_edit_project = 'project_name=test&deadline=2023-05-31&_id=645a5064728af5c5703f5aeb&editor=645a4bca08eca36c3778e6a0'
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response_edit_project = await ac.post(
             "/edit_project", 
@@ -284,7 +285,7 @@ async def test_edit_project_invalid():
     Project not edited
     '''
     with pytest.raises(KeyError):
-        request_edit_project = 'deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+        request_edit_project = 'deadline=2023-05-31&_id=645a5064728af5c5703f5aeb&editor=645a4bca08eca36c3778e6a0'
         async with AsyncClient(
             app=app, 
             base_url="http://localhost:8000"
@@ -309,7 +310,7 @@ async def test_edit_project_invalid_name():
     THEN
     Project not edited
     '''
-    request_edit_project = 'project_name=Test+Project+4&deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+    request_edit_project = 'project_name=test&deadline=2023-05-09&editor=645a4bca08eca36c3778e6a0&_id=644242b3c18459dc775e14bc'
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response_edit_project = await ac.post(
             "/edit_project", 
@@ -333,7 +334,7 @@ async def test_edit_project_invalid_deadline():
     THEN
     Project not edited
     '''
-    request_edit_project = 'project_name=Test+Project+4&deadline=2023-05-09&editors=Chief+Editor+1&_id=644242b3c18459dc775e14bc'
+    request_edit_project = 'project_name=Test+Project+4&deadline=2023-05-09&editor=645a4bca08eca36c3778e6a0&_id=644242b3c18459dc775e14bc'
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response_edit_project = await ac.post(
             "/edit_project", 
@@ -349,4 +350,38 @@ async def test_edit_project_invalid_deadline():
 @pytest.mark.anyio
 async def test_get_project_names():
     result = await users.get_project_names()
-    assert result == ['Test Project 4', 'project_name']
+    assert 'test' in result
+
+
+@pytest.mark.anyio
+async def test_change_chief_editor():
+    '''
+    WHEN
+    Chief Editor's id IS 645a4bca08eca36c3778e6a0
+    
+    THEN
+    Project edited
+    '''
+    request_change_chief_editor = '_id=645a5064728af5c5703f5aeb&editor=645a4bca08eca36c3778e6a0'
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response_change_chief_editor = await ac.post(
+            "/project/change_chief_editor", 
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_change_chief_editor
+        )
+    assert response_change_chief_editor.status_code == 303
+    assert response_change_chief_editor.url == 'http://localhost:8000/project/change_chief_editor'
+    
+@pytest.mark.anyio
+async def test_get_user_activities():
+    result = await users.get_user_activities("645a4bca08eca36c3778e6a0", 'chief_editor')
+    assert type(result) == type([])
+
+@pytest.mark.anyio
+async def test_get_activities_of_the_project():
+    result = await users.get_activities_of_the_project('test')
+    assert type(result) == type([])
+

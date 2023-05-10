@@ -95,29 +95,6 @@
                 </ul>
               </div>
             </li>
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#activities-collapse"
-                aria-expanded="false"
-              >
-                Activities
-              </button>
-              <div class="collapse" id="activities-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for activity in project_activities %}
-                  <li>
-                    <a
-                      href="/activity/{{activity['id']}}"
-                      class="link-dark d-inline-flex text-decoration-none rounded"
-                      >{{activity['activity_name']}}</a
-                    >
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </li>
             <li class="border-top my-3"></li>
             <li class="mb-1">
               <button
@@ -151,8 +128,13 @@
               <li class="breadcrumb-item">
                 <a
                   class="link-body-emphasis fw-semibold text-decoration-none"
+                  {% if status != 'finished' %}
                   href="http://localhost:8000/projects"
                   >Projects</a
+                  {% else %}
+                  href="http://localhost:8000/projects?archive=True"
+                  >Archive projects</a
+                  {% endif %}
                 >
               </li>
               <li class="breadcrumb-item">
@@ -182,6 +164,7 @@
                 {% endif %}
                 <h3>
                   Activities 
+                  {% if status != 'finished' %}
                   <!-- Button trigger modal -->
                   <button
                     type="button"
@@ -205,6 +188,7 @@
                       />
                     </svg>
                   </button>
+                  {% endif %}
                 </h3>
               </div>
 
@@ -245,13 +229,14 @@
 
                     
                     <div></div>
-                    
+                    {% if status != 'finished' %}
                       <button  type="button"
                               class="btn-1"
                               data-bs-toggle="modal"
-                              data-bs-target="#exampleModal1">
+                              data-bs-target="#exampleModal{{loop.index}}">
                         Edit the activity
                       </button>
+                    {% endif %}
                     </div>
                   </div>
                 </div>
@@ -278,17 +263,17 @@
 
     <div class="read_2">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+      {% for translator in project_translators %}
         <div class="col">
           <div class="card shadow-sm">
             <div class="modal-content rounded-4 shadow p-4">
               <div class="modal-header border-bottom-0">
-                <h1 class="modal-title fs-5">Project name</h1>
+                <h1 class="modal-title fs-5">{{translator['username']}}</h1>
               </div>
               <div class="">
-                <p>Chief edidor 1</p>
-                <p>Status</p>
+                <p>Status: {{translator['status']}}</p>
 
-                <p>Deadline</p>
+                <p>Effciciency: {{translator['efficiency']}}</p>
               </div>
               <div
                 class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0"
@@ -303,54 +288,11 @@
             </div>
           </div>
         </div>
-        <div class="col">
-          <div class="card shadow-sm">
-            <svg
-              class="bd-placeholder-img card-img-top"
-              width="100%"
-              height="250"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-label="Placeholder: Thumbnail"
-              preserveAspectRatio="xMidYMid slice"
-              focusable="false"
-            ></svg>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card shadow-sm">
-            <svg
-              class="bd-placeholder-img card-img-top"
-              width="100%"
-              height="250"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-label="Placeholder: Thumbnail"
-              preserveAspectRatio="xMidYMid slice"
-              focusable="false"
-            ></svg>
-          </div>
-        </div>
-
-        <div class="col">
-          <div class="card shadow-sm">
-            <svg
-              class="bd-placeholder-img card-img-top"
-              width="100%"
-              height="250"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-label="Placeholder: Thumbnail"
-              preserveAspectRatio="xMidYMid slice"
-              focusable="false"
-            ></svg>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
 </div>
-
 
 
 
@@ -376,13 +318,14 @@
 
           
           <div></div>
-          
+          {% if status != 'finished' %}
             <button  type="button"
                     class="btn-1"
                     data-bs-toggle="modal"
-                    data-bs-target="#exampleModal3">
+                    data-bs-target="#exampleModalChiefEditor">
               Change the Chief Editor
             </button>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -394,7 +337,7 @@
     <!-- Modal -->
     <div
     class="modal fade"
-    id="exampleModal3"
+    id="exampleModalChiefEditor"
     tabindex="-1"
     aria-labelledby="exampleModalLabel"
     aria-hidden="true"
@@ -452,7 +395,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">New Activities </h1>
+            <h1 class="modal-title fs-5" id="exampleModalLabel">New activity</h1>
             <button
               type="button"
               class="btn-close"
@@ -500,67 +443,12 @@
       </div>
     </div>
 
-    <div
-    class="modal fade"
-    id="exampleModal2"
-    tabindex="-1"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">New Translator </h1>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <form action="create_project" method="post">
-            <div class="mb-3">
-              <label for="recipient-name" class="col-form-label"
-                >Set the translator name:</label
-              >
-              <input required type="text" name="project_name" class="form-control" id="recipient-name" />
-            </div>
-            <div class="mb-3">
-              <label for="exampleSelect" class="form-label"
-                >Set the status</label
-              >
-              <select required class="form-select" id="exampleSelect" name="editors">
-                {% for chief_editor in chief_editors_list %}
-                <option value="{{chief_editor}}">{{status}}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label for="exampleSelect" class="form-label"
-                >Assign a translator</label
-              >
-              <select required class="form-select" id="exampleSelect" name="editor">
-                {% for translator in translators_list %}
-                <option value="{{chief_editor}}">{{translator}}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="modal-footer">
-          <button class="svv" type="submit"> Save </button>
-        </div>
-          </form>
-        </div>
-        
-      </div>
-    </div>
-  </div>
-
+    
+{% for activity in project_activities %}
 
     <div
             class="modal fade"
-            id="exampleModal1"
+            id="exampleModal{{loop.index}}"
             tabindex="-1"
             aria-labelledby="exampleModalLabel"
             aria-hidden="true"
@@ -568,7 +456,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel1">Edit Activities</h1>
+            <h1 class="modal-title fs-5" id="exampleModalLabel1">Edit activity</h1>
             <button
                     type="button"
                     class="btn-close"
@@ -579,9 +467,9 @@
           <div class="modal-body">
             <form action="edit_activity" method="post">
             <input required hidden type="text" name="project_name" class="form-control" id="recipient-name" value="{{current_project_name}}"/>
-            <input required hidden type="text" name="current_chief_editor" class="form-control" id="recipient-name" value="{{current_chief_editor}}"/>
+            <input required hidden type="text" name="current_chief_editor" class="form-control" id="recipient-name" value="{{current_chief_editor['id']}}"/>
             <input required hidden type="text" name="project_id" class="form-control" id="recipient-name" value="{{project_id}}"/>
-            <input required hidden type="text" name="_id" class="form-control" id="recipient-name" value="{{_id}}"/>
+            <input required hidden type="text" name="activity_id" class="form-control" id="recipient-name" value="{{activity['_id']}}"/>
               <div class="mb-3">
                 <label for="recipient-name" class="col-form-label"
                 >Edit the Activities name:</label
@@ -612,59 +500,9 @@
           </div>
 
         </div>
-
-
-         <div
-            class="modal fade"
-            id="exampleModal1"
-            tabindex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel1">Edit Activities</h1>
-            <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form action="edit_project" method="post">
-              <div class="mb-3">
-                <label for="recipient-name" class="col-form-label"
-                >Edit the Activities name:</label
-                >
-                <input required type="text" name="project_name" class="form-control" id="recipient-name" />
-              </div>
-              <div class="mb-3">
-                <label for="message-text" class="col-form-label"
-                >Edit deadline date:</label
-                >
-                <input required type="date" name="deadline" class="form-control" id="recipient-name" />
-              </div>
-              <div class="mb-3">
-                <label for="exampleSelect" class="form-label"
-                  >Change a translater</label
-                >
-                <select required class="form-select" id="exampleSelect" name="editors">
-                  {% for chief_editor in chief_editors_list %}
-                  <option value="{{chief_editor}}">{{chief_editor}}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              
-              <div class="modal-footer">
-                <button class="svv" type="submit"> Save </button>
-              </div>
-            </form>
-          </div>
-
         </div>
-        
+        </div>
+{% endfor %}
         
     
   </body>

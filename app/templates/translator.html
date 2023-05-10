@@ -10,7 +10,7 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link href="./style.css" rel="stylesheet" />
+    <link href="../static/project_style.css" rel="stylesheet" />
     <title>Translator</title>
   </head>
   <body>
@@ -94,77 +94,7 @@
                 </ul>
               </div>
             </li>
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#chief-editors-collapse"
-                aria-expanded="false"
-              >
-                Chief editors
-              </button>
-              <div class="collapse" id="chief-editors-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Chief editor 1</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Chief editor 2</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Chief editor 3</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#translators-collapse"
-                aria-expanded="false"
-              >
-                Translators
-              </button>
-              <div class="collapse" id="translators-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li>
-                    <a
-                      href="#"
-                      class="link-dark d-inline-flex text-decoration-none rounded"
-                      >Translator 1</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-dark d-inline-flex text-decoration-none rounded"
-                      >Translators</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-dark d-inline-flex text-decoration-none rounded"
-                      >Translators</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </li>
+            
 
             <li class="border-top my-3"></li>
 
@@ -185,25 +115,11 @@
       <!-- Here starts content part -->
 
       <div class="p-3 maining">
+      <form method="post" action="logout">
+          <button class="lg" type="Logout" name="Logout" value="Logout"> Log Out </button>
+        </form>
         <div class="container my-5">
-          <nav aria-label="breadcrumb">
-            <ol
-              class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-3"
-            >
-              <li class="breadcrumb-item">
-                <a
-                  class="link-body-emphasis fw-semibold text-decoration-none"
-                  href="#"
-                  >Projects</a
-                >
-              </li>
-              <li class="breadcrumb-item" aria-current="page">Project 1</li>
-
-              <li class="breadcrumb-item active" aria-current="page">
-                Activity 1
-              </li>
-            </ol>
-          </nav>
+          
         </div>
 
         <div class="container">
@@ -303,13 +219,15 @@
                 </tr>
               </thead>
               <tbody>
+              {% for activity in activities %}
+              {% if activity['project_status'] != 'finished' %}
                 <tr>
-                  <th scope="row">Activity 1</th>
-                  <td>Project 1</td>
-                  <td>in work</td>
+                  <th scope="row">{{ activity['activity_name'] }}</th>
+                  <td>{{ activity['project_name'] }}</td>
+                  <td>{{ activity['status'] }}</td>
                   <td>20 hours</td>
                   <td>stable</td>
-                  <td></td>
+                  <td>{{ activity['deadline'] }}</td>
                   <td>
                     <button
                       type="button"
@@ -331,123 +249,10 @@
                       report
                     </button>
                   </td>
+                  {% endif %}
+                  {% endfor %}
                 </tr>
-                <tr>
-                  <th scope="row">Activity 2</th>
-                  <td>Project 2</td>
-                  <td>rewriting</td>
-                  <td>2 hours</td>
-                  <td>-20%</td>
-                  <td></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white"
-                      data-bs-toggle="modal"
-                      data-bs-target="#send"
-                    >
-                      send
-                    </button>
-                  </td>
-                  <td><p class="text-danger">high</p></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white"
-                      data-bs-toggle="modal"
-                      data-bs-target="#report"
-                    >
-                      report
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Activity 3</th>
-                  <td>Project 7</td>
-                  <td>checking</td>
-                  <td>9 hours</td>
-                  <td>+10%</td>
-                  <td></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white disabled"
-                      data-bs-toggle="modal"
-                      data-bs-target="#send"
-                    >
-                      send
-                    </button>
-                  </td>
-                  <td><p class="text-dark">low</p></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white"
-                      data-bs-toggle="modal"
-                      data-bs-target="#report"
-                    >
-                      report
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Activity 4</th>
-                  <td>Project 2</td>
-                  <td>checking</td>
-                  <td>21 hours</td>
-                  <td>-50%</td>
-                  <td></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white disabled"
-                      data-bs-toggle="modal"
-                      data-bs-target="#send"
-                    >
-                      send
-                    </button>
-                  </td>
-                  <td><p class="text-warning">medium</p></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white"
-                      data-bs-toggle="modal"
-                      data-bs-target="#report"
-                    >
-                      report
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Activity 5</th>
-                  <td>Project 3</td>
-                  <td>assigned</td>
-                  <td>47 minutes</td>
-                  <td>-10%</td>
-                  <td></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white"
-                      data-bs-toggle="modal"
-                      data-bs-target="#send"
-                    >
-                      send
-                    </button>
-                  </td>
-                  <td><p class="text-danger">high</p></td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn bg-white"
-                      data-bs-toggle="modal"
-                      data-bs-target="#report"
-                    >
-                      report
-                    </button>
-                  </td>
-                </tr>
+                
               </tbody>
             </table>
           </div>
