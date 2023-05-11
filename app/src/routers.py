@@ -319,13 +319,27 @@ async def auth(
 async def read_users_me(request: Request):
     user = await users.get_current_user_from_cookie(request)
     if user['role'] == 'translator':
-        activities = await users.get_user_activities(str(user['_id']), 'translators')
+        user_id = str(user['_id'])
+        activities = await users.get_user_activities(user_id, 'translators')
+        current_user = await users.get_user_by_id(user_id)
         return templates.TemplateResponse(
-            'translator.html', {'request': request, 'activities': activities}
+            'translator.html',
+            {
+                'request': request, 
+                'activities': activities,
+                'current_user': current_user
+            }
         )
     if user['role'] == 'chief_editor':
+        user_id = str(user['_id'])
+        activities = await users.get_user_activities(user_id, 'editor')
+        current_chief_editor = await users.get_user_by_id(user_id)
         return templates.TemplateResponse(
-            'chief_editor.html', {'request': request}
+            'chief_editor.html', {
+                'request': request,
+                'current_chief_editor': current_chief_editor,
+                'chief_editor_activities': activities,
+            }
         )
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
@@ -388,11 +402,10 @@ async def edit_activity(request: Request):
         'completeness': 0.0,
         'status': 'created',
     }
-    result = await users.edit_activity(
+    await users.edit_activity(
         models.ActivityModel(**activity), 
         form['activity_id']
     )
-    print(result)
     return RedirectResponse(
         f"http://{url}/project/{form['project_id']}", 
         status_code=status.HTTP_303_SEE_OTHER
@@ -507,21 +520,22 @@ async def show_chief_editor(request: Request, chief_editor_id: str):
     projects = await users.get_projects('created')
     projects = sorted(projects, key=lambda d: d['deadline'])
     activities = await users.get_user_activities(chief_editor_id, 'editor')
-    print(activities)
     user = await users.get_current_user_from_cookie(request)
+    print(current_chief_editor)
     if not user:
         return RedirectResponse(
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER
         )
     if user['role'] == 'project_manager':
         return templates.TemplateResponse(
-            'chief_editor.html', 
+            'chief_editor_pm.html', 
             {
                 'request': request,
                 'chief_editors_list': chief_editors_list, 
                 'all_projects': projects, 
                 'translators_list': translators_list,
-                'current_translator': current_chief_editor['username'],
+                'current_chief_editor': current_chief_editor,
+                'chief_editor_activities': activities,
             }
         )
     return RedirectResponse(

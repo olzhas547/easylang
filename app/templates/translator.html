@@ -10,118 +10,30 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link href="../static/project_style.css" rel="stylesheet" />
+    <link href="../static/translator.css" rel="stylesheet" />
     <title>Translator</title>
   </head>
   <body>
-    <main class="d-flex flex-nowrap">
-      <nav class="col-lg-2" style="background: #449ed1" id="nav">
-        <div class="flex-shrink-0 p-3" style="width: 100%">
-          <a
-            href="/"
-            class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom text-center"
-          >
-            <h3 class="text-white">EasyLang</h3>
-          </a>
-          <ul class="list-unstyled ps-0">
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#projects-collapse"
-                aria-expanded="false"
-              >
-                Projects
-              </button>
-              <div class="collapse" id="projects-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Project 1</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Project 2</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Project 3</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#activities-collapse"
-                aria-expanded="false"
-              >
-                Activities
-              </button>
-              <div class="collapse" id="activities-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 1</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 2</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >Activity 3</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </li>
-            
-
-            <li class="border-top my-3"></li>
-
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#notification-collapse"
-                aria-expanded="false"
-              >
-                Notifications
-              </button>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
+    
       <!-- Here starts content part -->
-
       <div class="p-3 maining">
-      <form method="post" action="logout">
+        <form method="post" action="logout">
           <button class="lg" type="Logout" name="Logout" value="Logout"> Log Out </button>
         </form>
-        <div class="container my-5">
-          
         </div>
+        <div class="container my-5">
+          <nav aria-label="breadcrumb">
+            <ol
+              class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-3"
+            >
+            <li class="breadcrumb-item" aria-current="page">Translators</li>
+              <li class="breadcrumb-item" aria-current="page">{{ current_user['username'] }}</li>
 
+            </ol>
+          </nav>
+        </div>
+</div>
+</div>
         <div class="container">
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
             <div class="col">
@@ -186,20 +98,10 @@
           <div class="mt-5">
             <div class="row mb-3">
               <div class="col-md-4">
-                <h3>Translator 1</h3>
+                <h3>{{current_user['username']}}</h3>
               </div>
 
               <div class="col-md-4"></div>
-              <div class="col-md-4" style="text-align: right">
-                <form role="search">
-                  <input
-                    type="search"
-                    class="form-control"
-                    placeholder="Search..."
-                    aria-label="Search"
-                  />
-                </form>
-              </div>
             </div>
 
             <table
@@ -219,8 +121,7 @@
                 </tr>
               </thead>
               <tbody>
-              {% for activity in activities %}
-              {% if activity['project_status'] != 'finished' %}
+                {% for activity in activities %}
                 <tr>
                   <th scope="row">{{ activity['activity_name'] }}</th>
                   <td>{{ activity['project_name'] }}</td>
@@ -249,10 +150,7 @@
                       report
                     </button>
                   </td>
-                  {% endif %}
                   {% endfor %}
-                </tr>
-                
               </tbody>
             </table>
           </div>

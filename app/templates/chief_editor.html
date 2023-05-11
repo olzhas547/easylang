@@ -15,102 +15,7 @@
   </head>
   <body>
     <main class="d-flex flex-nowrap">
-      <nav class="col-lg-2" style="background: #449ed1" id="nav">
-        <div class="flex-shrink-0 p-3" style="width: 100%">
-          <a
-            href="/"
-            class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom text-center"
-          >
-            <h3 class="text-white">EasyLang</h3>
-          </a>
-          <ul class="list-unstyled ps-0">
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#projects-collapse"
-                aria-expanded="false"
-              >
-                Projects
-              </button>
-              <div class="collapse" id="projects-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for project in all_projects %}
-                  <li>
-                    <a
-                      href="/project/{{ project['id'] }}"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{ project['project_name'] }}</a
-                    >
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </li>
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#chief-editors-collapse"
-                aria-expanded="false"
-              >
-                Chief editors
-              </button>
-              <div class="collapse" id="chief-editors-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for chief_editor in chief_editors_list %}
-                  <li>
-                    <a
-                      href="/chief_editor/{{chief_editor['id']}}"
-                      class="link-body-emphasis d-inline-flex text-decoration-none rounded"
-                      >{{chief_editor['username']}}</a
-                    >
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </li>
-
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#translators-collapse"
-                aria-expanded="false"
-              >
-                Translators
-              </button>
-              <div class="collapse" id="translators-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  {% for translator in translators_list %}
-                  <li>
-                    <a
-                      href="/translator/{{translator['id']}}"
-                      class="link-dark d-inline-flex text-decoration-none rounded"
-                      >{{translator['username']}}</a
-                    >
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </li>
-            <li class="border-top my-3"></li>
-            <li class="mb-1">
-              <button
-                class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#notification-collapse"
-                aria-expanded="false"
-              >
-                Notifications
-              </button>
-              
-         
-            </li>
-            
-          </ul>
-        </div>
-      </nav>
+      
 
       <!-- Here starts content part -->
 
@@ -124,7 +29,7 @@
               class="breadcrumb breadcrumb-chevron p-3 bg-body-secondary rounded-3"
             >
               <li class="breadcrumb-item">Chief editors</li>
-              <li class="breadcrumb-item" aria-current="page">Chief editor name</li>
+              <li class="breadcrumb-item" aria-current="page">{{ current_chief_editor['username'] }}</li>
             </ol>
           </nav>
         </div>
@@ -193,20 +98,10 @@
           <div class="mt-5">
             <div class="row mb-3">
               <div class="col-md-4">
-                <h3>Chief Editor 1</h3>
+                <h3>{{ current_chief_editor['username'] }}</h3>
               </div>
 
               <div class="col-md-4"></div>
-              <div class="col-md-4" style="text-align: right">
-                <form role="search">
-                  <input
-                    type="search"
-                    class="form-control"
-                    placeholder="Search..."
-                    aria-label="Search"
-                  />
-                </form>
-              </div>
             </div>
 
             <table
