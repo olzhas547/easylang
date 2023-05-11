@@ -9,6 +9,7 @@ import models
 import datetime
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from src import view
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates/")
@@ -29,7 +30,7 @@ async def test(request: Request):
         return RedirectResponse(
             f'http://{url}/me', status_code=status.HTTP_303_SEE_OTHER
         )
-    return templates.TemplateResponse('test.html', {'request': request})
+    return view.main_page(request)
 
 @router.get("/projects")
 async def show_projects(
@@ -55,20 +56,10 @@ async def show_projects(
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER
         )
     if user['role'] == 'project_manager':
-        return templates.TemplateResponse(
-            'projects.html', 
-            {
-                'request': request, 
-                'chief_editors_list': chief_editors_list, 
-                'all_projects': projects, 
-                'projects': projects_current_page, 
-                'translators_list': translators_list, 
-                'num_of_pages': num_of_pages, 
-                'current_page': page,
-                'archive': archive,
-                'incorrect_time': incorrect_time,
-                'incorrect_name': incorrect_name,
-            }
+        return view.projects_page(
+            request, chief_editors_list, projects, projects_current_page, 
+            translators_list, num_of_pages, page, archive, incorrect_time,
+            incorrect_name,
         )
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
@@ -107,21 +98,11 @@ async def show_project(
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER
         )
     if user['role'] == 'project_manager':
-        return templates.TemplateResponse(
-            'project.html', 
-            {
-                'request': request, 
-                'chief_editors_list': chief_editors_list, 
-                'all_projects': projects, 
-                'translators_list': translators_list, 
-                'current_project_name': project['project_name'], 
-                'current_chief_editor': current_chief_editor,
-                'status': project['status'],
-                'project_activities': project_activities,
-                'project_id': project_id,
-                'project_translators': project_translators,
-                'incorrect_time': incorrect_time,
-            }
+        return view.project_page(
+            request, chief_editors_list, projects, translators_list, 
+            project['project_name'], current_chief_editor, project['status'],
+            project_activities, project_id, project_translators, 
+            incorrect_time,
         )
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
@@ -221,15 +202,7 @@ async def login(request: Request, not_valid: bool = False):
         return RedirectResponse(
             f'http://{url}/', status_code=status.HTTP_303_SEE_OTHER
         )
-    return templates.TemplateResponse(
-        'registration_page.html', {'request': request, 'not_valid': not_valid}
-    )
-
-@router.get('/forgot_password', response_class=HTMLResponse)
-async def forgot_password(request: Request, not_valid: bool = False):
-    return templates.TemplateResponse(
-        'forgot_password.html', {'request': request, 'not_valid': not_valid}
-    )
+    return view.registration_page(request, not_valid)
 
 @router.post("/login_form")
 async def auth(
@@ -275,24 +248,13 @@ async def read_users_me(request: Request):
         user_id = str(user['_id'])
         activities = await users.get_user_activities(user_id, 'translators')
         current_user = await users.get_user_by_id(user_id)
-        return templates.TemplateResponse(
-            'translator.html',
-            {
-                'request': request, 
-                'activities': activities,
-                'current_user': current_user
-            }
-        )
+        return view.translator_page(request, activities, current_user)
     if user['role'] == 'chief_editor':
         user_id = str(user['_id'])
         activities = await users.get_user_activities(user_id, 'editor')
         current_chief_editor = await users.get_user_by_id(user_id)
-        return templates.TemplateResponse(
-            'chief_editor.html', {
-                'request': request,
-                'current_chief_editor': current_chief_editor,
-                'chief_editor_activities': activities,
-            }
+        return view.chief_editor_page(
+            request, current_chief_editor, activities
         )
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
@@ -402,16 +364,9 @@ async def show_translator(request: Request, translator_id: str):
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER
         )
     if user['role'] == 'project_manager':
-        return templates.TemplateResponse(
-            'translator_pm.html', 
-            {
-                'request': request,
-                'chief_editors_list': chief_editors_list, 
-                'all_projects': projects, 
-                'translators_list': translators_list,
-                'current_translator': current_translator['username'],
-                'activities': activities,
-            }
+        return view.translator_pm_page(
+            request, chief_editors_list, projects,
+            translators_list, current_translator['username'], activities
         )
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
@@ -431,16 +386,9 @@ async def show_chief_editor(request: Request, chief_editor_id: str):
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER
         )
     if user['role'] == 'project_manager':
-        return templates.TemplateResponse(
-            'chief_editor_pm.html', 
-            {
-                'request': request,
-                'chief_editors_list': chief_editors_list, 
-                'all_projects': projects, 
-                'translators_list': translators_list,
-                'current_chief_editor': current_chief_editor,
-                'chief_editor_activities': activities,
-            }
+        return view.chief_editor_pm_page(
+            request, chief_editors_list, projects,
+            translators_list, current_chief_editor, activities
         )
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER

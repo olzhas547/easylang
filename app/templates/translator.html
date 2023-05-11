@@ -113,6 +113,7 @@
                   <th scope="col">Project</th>
                   <th scope="col">Status</th>
                   <th scope="col">Left hours</th>
+                  <th scope="col">Penalty</th>
                   <th scope="col">Effectiveness</th>
                   <th scope="col">Deadline</th>
                   <th scope="col">Checking</th>
@@ -127,6 +128,8 @@
                   <td>{{ activity['project_name'] }}</td>
                   <td>{{ activity['status'] }}</td>
                   <td>20 hours</td>
+                  <td><p id="status-text">5h</p>
+                  </td>
                   <td>stable</td>
                   <td>{{ activity['deadline'] }}</td>
                   <td>
@@ -337,7 +340,17 @@
       </div>
     </div>
   </body>
+<script>
+    // Получение ссылки на элемент с текстом статуса
+var statusText = document.getElementById("status-text");
 
+// Пример использования: изменение цвета текста на зеленый для положительного статуса
+statusText.classList.add("positive");
+
+// Пример использования: изменение цвета текста на красный для отрицательного статуса
+statusText.classList.add("negative");
+
+  </script>
   <script
     src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
