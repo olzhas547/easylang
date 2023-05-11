@@ -15,6 +15,8 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates/")
 url = "localhost:8000"
 
+'''USER STORY AUTHORIZATION'''
+
 @router.get('/', response_class=HTMLResponse)
 async def test(request: Request):
     user = await users.get_current_user_from_cookie(request)
@@ -31,6 +33,116 @@ async def test(request: Request):
             f'http://{url}/me', status_code=status.HTTP_303_SEE_OTHER
         )
     return view.main_page(request)
+
+@router.post("/logout")
+async def logout(response: Response):
+    response_logout = RedirectResponse(
+        f'http://{url}/login', 
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response_logout.delete_cookie(key='Authorization')
+    return response_logout
+
+@router.post("/project/logout")
+async def project_logout(response: Response):
+    response_logout = RedirectResponse(
+        f'http://{url}/login', 
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response_logout.delete_cookie(key='Authorization')
+    return response_logout
+
+@router.post("/sign-up", response_model=models.User)
+async def app_create_user(user: models.UserCreate):
+    db_user = await users.get_user_by_login(login=user.login)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Login already registered")
+    return await users.create_user(user=user)
+
+@router.get('/login', response_class=HTMLResponse)
+async def login(request: Request, not_valid: bool = False):
+    user = await users.get_current_user_from_cookie(request)
+    if user:
+        return RedirectResponse(
+            f'http://{url}/', status_code=status.HTTP_303_SEE_OTHER
+        )
+    return view.registration_page(request, not_valid)
+
+@router.post("/login_form")
+async def auth(
+        response: Response, 
+        form_data: OAuth2PasswordRequestForm = Depends()
+    ):
+    user = await users.get_user_by_login(login=form_data.username)
+    if not user:
+        raise HTTPException(
+            status_code=302, 
+            detail="Incorrect login or password", 
+            headers = {"Location": f"http://{url}/login?not_valid=true"}
+        )
+        
+    if not users.validate_password(
+        password=form_data.password, hashed_password=user["password"]
+    ):
+        raise HTTPException(
+            status_code=302, 
+            detail="Incorrect login or password", 
+            headers = {"Location": f"http://{url}/login?not_valid=true"}
+        )
+
+    token = await users.create_user_token(
+        user_id=users.user_helper(user)["id"]
+    )
+    response = RedirectResponse(
+        f'http://{url}/', 
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response.set_cookie(
+        key='Authorization',
+        value=token,
+        httponly=True,
+        expires=86400
+    )
+    return response
+
+@router.post("/chief_editor/logout")
+async def chief_editor_logout(response: Response):
+    response_logout = RedirectResponse(
+        f'http://{url}/login', 
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response_logout.delete_cookie(key='Authorization')
+    return response_logout
+
+@router.post("/translator/logout")
+async def translator_logout(response: Response):
+    response_logout = RedirectResponse(
+        f'http://{url}/login', 
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response_logout.delete_cookie(key='Authorization')
+    return response_logout
+
+@router.get("/me")
+async def read_users_me(request: Request):
+    user = await users.get_current_user_from_cookie(request)
+    if user['role'] == 'translator':
+        user_id = str(user['_id'])
+        activities = await users.get_user_activities(user_id, 'translators')
+        current_user = await users.get_user_by_id(user_id)
+        return view.translator_page(request, activities, current_user)
+    if user['role'] == 'chief_editor':
+        user_id = str(user['_id'])
+        activities = await users.get_user_activities(user_id, 'editor')
+        current_chief_editor = await users.get_user_by_id(user_id)
+        return view.chief_editor_page(
+            request, current_chief_editor, activities
+        )
+    return RedirectResponse(
+        f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
+    )
+
+'''USER STORY PROJECT AND ARCHIVE'''
 
 @router.get("/projects")
 async def show_projects(
@@ -186,79 +298,29 @@ async def edit_project(request: Request):
         f'http://{url}/projects', status_code=status.HTTP_303_SEE_OTHER
     )
 
-
-
-@router.post("/sign-up", response_model=models.User)
-async def app_create_user(user: models.UserCreate):
-    db_user = await users.get_user_by_login(login=user.login)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Login already registered")
-    return await users.create_user(user=user)
-
-@router.get('/login', response_class=HTMLResponse)
-async def login(request: Request, not_valid: bool = False):
-    user = await users.get_current_user_from_cookie(request)
-    if user:
-        return RedirectResponse(
-            f'http://{url}/', status_code=status.HTTP_303_SEE_OTHER
-        )
-    return view.registration_page(request, not_valid)
-
-@router.post("/login_form")
-async def auth(
-        response: Response, 
-        form_data: OAuth2PasswordRequestForm = Depends()
-    ):
-    user = await users.get_user_by_login(login=form_data.username)
-    if not user:
-        raise HTTPException(
-            status_code=302, 
-            detail="Incorrect login or password", 
-            headers = {"Location": f"http://{url}/login?not_valid=true"}
-        )
-        
-    if not users.validate_password(
-        password=form_data.password, hashed_password=user["password"]
-    ):
-        raise HTTPException(
-            status_code=302, 
-            detail="Incorrect login or password", 
-            headers = {"Location": f"http://{url}/login?not_valid=true"}
-        )
-
-    token = await users.create_user_token(
-        user_id=users.user_helper(user)["id"]
+@router.post("/project/change_chief_editor")
+async def change_chief_editor(request: Request):
+    result = await request.form()
+    project = await users.get_project_by_id(result['_id'])
+    activity = {
+        'activity_name': 'initial_activity',
+        'project_name': project['project_name'],
+        'translators': None,
+        'editor': result['editor'],
+        'deadline': project['deadline'],
+        'project_status': project['status'],
+        'completeness': 0,
+        'status': 'finished'
+    }
+    await users.edit_project(
+        models.ActivityModel(**activity), result['_id']
     )
-    response = RedirectResponse(
-        f'http://{url}/', 
+    return RedirectResponse(
+        f"http://{url}/project/{result['_id']}",
         status_code=status.HTTP_303_SEE_OTHER
     )
-    response.set_cookie(
-        key='Authorization',
-        value=token,
-        httponly=True,
-        expires=86400
-    )
-    return response
 
-@router.get("/me")
-async def read_users_me(request: Request):
-    user = await users.get_current_user_from_cookie(request)
-    if user['role'] == 'translator':
-        user_id = str(user['_id'])
-        activities = await users.get_user_activities(user_id, 'translators')
-        current_user = await users.get_user_by_id(user_id)
-        return view.translator_page(request, activities, current_user)
-    if user['role'] == 'chief_editor':
-        user_id = str(user['_id'])
-        activities = await users.get_user_activities(user_id, 'editor')
-        current_chief_editor = await users.get_user_by_id(user_id)
-        return view.chief_editor_page(
-            request, current_chief_editor, activities
-        )
-    return RedirectResponse(
-        f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
-    )
+'''USER STORY ACTIVITY'''
 
 @router.post("/project/create_activity")
 async def create_activity(request: Request):
@@ -314,41 +376,8 @@ async def edit_activity(request: Request):
         status_code=status.HTTP_303_SEE_OTHER
     )
 
-@router.post("/logout")
-async def logout(response: Response):
-    response_logout = RedirectResponse(
-        f'http://{url}/login', 
-        status_code=status.HTTP_303_SEE_OTHER
-    )
-    response_logout.delete_cookie(key='Authorization')
-    return response_logout
 
-@router.post("/project/logout")
-async def project_logout(response: Response):
-    response_logout = RedirectResponse(
-        f'http://{url}/login', 
-        status_code=status.HTTP_303_SEE_OTHER
-    )
-    response_logout.delete_cookie(key='Authorization')
-    return response_logout
-
-@router.post("/chief_editor/logout")
-async def chief_editor_logout(response: Response):
-    response_logout = RedirectResponse(
-        f'http://{url}/login', 
-        status_code=status.HTTP_303_SEE_OTHER
-    )
-    response_logout.delete_cookie(key='Authorization')
-    return response_logout
-
-@router.post("/translator/logout")
-async def translator_logout(response: Response):
-    response_logout = RedirectResponse(
-        f'http://{url}/login', 
-        status_code=status.HTTP_303_SEE_OTHER
-    )
-    response_logout.delete_cookie(key='Authorization')
-    return response_logout
+'''USER STORY TRANSLATOR'''
 
 @router.get("/translator/{translator_id}")
 async def show_translator(request: Request, translator_id: str):
@@ -372,6 +401,8 @@ async def show_translator(request: Request, translator_id: str):
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
     )
 
+'''USER STORY CHIEF EDITOR'''
+
 @router.get("/chief_editor/{chief_editor_id}")
 async def show_chief_editor(request: Request, chief_editor_id: str):
     current_chief_editor = await users.get_user_by_id(chief_editor_id)
@@ -392,26 +423,4 @@ async def show_chief_editor(request: Request, chief_editor_id: str):
         )
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
-    )
-
-@router.post("/project/change_chief_editor")
-async def change_chief_editor(request: Request):
-    result = await request.form()
-    project = await users.get_project_by_id(result['_id'])
-    activity = {
-        'activity_name': 'initial_activity',
-        'project_name': project['project_name'],
-        'translators': None,
-        'editor': result['editor'],
-        'deadline': project['deadline'],
-        'project_status': project['status'],
-        'completeness': 0,
-        'status': 'finished'
-    }
-    await users.edit_project(
-        models.ActivityModel(**activity), result['_id']
-    )
-    return RedirectResponse(
-        f"http://{url}/project/{result['_id']}",
-        status_code=status.HTTP_303_SEE_OTHER
     )
