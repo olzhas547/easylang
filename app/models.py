@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from datetime import datetime
-from bson.objectid import ObjectId
 
 class ProjectCreate(BaseModel):
     project_name: str

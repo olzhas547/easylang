@@ -3,12 +3,10 @@ from fastapi import (
 )
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from bson.objectid import ObjectId
 from src import users
 import math
 import models
 import datetime
-import database
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
@@ -32,26 +30,6 @@ async def test(request: Request):
             f'http://{url}/me', status_code=status.HTTP_303_SEE_OTHER
         )
     return templates.TemplateResponse('test.html', {'request': request})
-
-@router.get('/get_projects')
-async def get_projects(request: Request):
-    project_names = await users.get_projects()
-    projects = []
-    for i in project_names:
-        project = await users.get_project(i)
-        projects.append(project)
-    return projects
-
-@router.get('/get_project_names')
-async def get_project_names(request: Request):
-    project_names = await users.get_projects()
-    return project_names
-
-@router.get('/get_activities')
-async def get_activities_of_the_project(request: Request, project: str):
-    return await users.get_activities_of_the_project(project)
-
-
 
 @router.get("/projects")
 async def show_projects(
@@ -97,7 +75,11 @@ async def show_projects(
     )
 
 @router.get("/project/{project_id}")
-async def show_project(request: Request, project_id: str, incorrect_time: bool = False):
+async def show_project(
+    request: Request, 
+    project_id: str, 
+    incorrect_time: bool = False
+):
     chief_editors_list = await users.get_list_of_users('chief_editor')
     translators_list = await users.get_list_of_users('translator')
     project =  await users.get_project_by_id(project_id)
@@ -224,35 +206,6 @@ async def edit_project(request: Request):
     )
 
 
-@router.get("/users_list")
-async def users_list_in_bd():
-    users_list = []
-    async for user in database.users_collection.find():
-        users_list.append(users.user_helper(user))
-    return users_list
-
-@router.get("/tokens")
-async def read_tokens():
-    tokens = []
-    async for token in database.tokens_collection.find():
-        tokens.append(users.token_helper(token))
-    return tokens
-
-@router.get("/delete_tokens")
-async def delete_tokens():
-    async for token in database.tokens_collection.find():
-        database.tokens_collection.delete_one(
-            {"_id": ObjectId(users.token_helper(token)["access_token"])}
-        )
-    return True
-
-@router.get("/delete")
-async def delete_user(id: str):
-    user = await database.users_collection.find_one({"_id": ObjectId(id)})
-    if user:
-        await database.users_collection.delete_one({"_id": ObjectId(id)})
-        return True
-
 
 @router.post("/sign-up", response_model=models.User)
 async def app_create_user(user: models.UserCreate):
@@ -308,7 +261,7 @@ async def auth(
         status_code=status.HTTP_303_SEE_OTHER
     )
     response.set_cookie(
-        key=users.COOKIE_NAME,
+        key='Authorization',
         value=token,
         httponly=True,
         expires=86400
@@ -344,18 +297,6 @@ async def read_users_me(request: Request):
     return RedirectResponse(
         f'http://{url}', status_code=status.HTTP_303_SEE_OTHER
     )
-
-@router.get("/user/status")
-async def get_status(request: Request):
-    user = await users.get_current_user_from_cookie(request)
-    return await users.get_status(user)
-
-@router.post("/user/status")
-async def set_status(
-    user_status: str, 
-    current_user: models.User = Depends(users.get_current_user)
-):
-    return await users.set_status(user_status, current_user)
 
 @router.post("/project/create_activity")
 async def create_activity(request: Request):
@@ -411,49 +352,13 @@ async def edit_activity(request: Request):
         status_code=status.HTTP_303_SEE_OTHER
     )
 
-@router.post("/set_activity_estimated_time")
-async def set_activity_estimated_time(
-    activity: str,
-    time: int,
-    current_user: models.User = Depends(users.get_current_user)
-):
-    if current_user["role"] != 'translator':
-        raise HTTPException(status_code=400, detail='Incorrect user role')
-    return await users.set_time(ObjectId(activity), time)
-
-@router.post("/user/set_activity_translator")
-async def set_activity_translator(
-    activity: str,
-    translator_id: str, 
-    current_user: models.User = Depends(users.get_current_user)
-):
-    if current_user["role"] != 'project_manager':
-        raise HTTPException(status_code=400, detail='Incorrect user role')
-    return await users.set_activity_translator(
-        ObjectId(activity), 
-        ObjectId(translator_id)
-    )
-
-@router.post("/user/set_activity_editor")
-async def set_activity_editor(
-    activity: str,
-    editor_id: str,
-    current_user: models.User = Depends(users.get_current_user)
-):
-    if current_user["role"] != 'project_manager':
-        raise HTTPException(status_code=400, detail='Incorrect user role')
-    return await users.set_activity_editor(
-        ObjectId(activity), 
-        ObjectId(editor_id)
-    )
-
 @router.post("/logout")
 async def logout(response: Response):
     response_logout = RedirectResponse(
         f'http://{url}/login', 
         status_code=status.HTTP_303_SEE_OTHER
     )
-    response_logout.delete_cookie(key=users.COOKIE_NAME)
+    response_logout.delete_cookie(key='Authorization')
     return response_logout
 
 @router.post("/project/logout")
@@ -462,7 +367,7 @@ async def project_logout(response: Response):
         f'http://{url}/login', 
         status_code=status.HTTP_303_SEE_OTHER
     )
-    response_logout.delete_cookie(key=users.COOKIE_NAME)
+    response_logout.delete_cookie(key='Authorization')
     return response_logout
 
 @router.post("/chief_editor/logout")
@@ -471,7 +376,7 @@ async def chief_editor_logout(response: Response):
         f'http://{url}/login', 
         status_code=status.HTTP_303_SEE_OTHER
     )
-    response_logout.delete_cookie(key=users.COOKIE_NAME)
+    response_logout.delete_cookie(key='Authorization')
     return response_logout
 
 @router.post("/translator/logout")
@@ -480,7 +385,7 @@ async def translator_logout(response: Response):
         f'http://{url}/login', 
         status_code=status.HTTP_303_SEE_OTHER
     )
-    response_logout.delete_cookie(key=users.COOKIE_NAME)
+    response_logout.delete_cookie(key='Authorization')
     return response_logout
 
 @router.get("/translator/{translator_id}")
@@ -521,7 +426,6 @@ async def show_chief_editor(request: Request, chief_editor_id: str):
     projects = sorted(projects, key=lambda d: d['deadline'])
     activities = await users.get_user_activities(chief_editor_id, 'editor')
     user = await users.get_current_user_from_cookie(request)
-    print(current_chief_editor)
     if not user:
         return RedirectResponse(
             f'http://{url}/login', status_code=status.HTTP_303_SEE_OTHER

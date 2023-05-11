@@ -5,11 +5,9 @@ from fastapi import  Request
 from bson.objectid import ObjectId
 from datetime import datetime, timedelta
 import database
-from config import settings
 import models
-from jose import JWTError, jwt
 
-def user_helper(user) -> dict:
+def user_helper(user) -> dict: #TESTED
     return {
         "id": str(user["_id"]),
         "login": str(user["login"]),
@@ -21,7 +19,7 @@ def user_helper(user) -> dict:
         "is_active": user["is_active"]
     }
 
-def token_helper(token) -> dict:
+def token_helper(token) -> dict: #TESTED
     return {
         "access_token": str(token["_id"]),
         "user_id": str(token["user_id"]),
@@ -29,7 +27,7 @@ def token_helper(token) -> dict:
         'token_type': token['token_type']
     }
 
-def project_helper(activity) -> dict:
+def project_helper(activity) -> dict: #TESTED
     return {
         'project_name': activity['project_name'],
         'editor': str(activity['editor']),
@@ -38,7 +36,7 @@ def project_helper(activity) -> dict:
         'id': str(activity['_id'])
     }
 
-def activity_helper(activity) -> dict:
+def activity_helper(activity) -> dict: #TESTED
     return {
         '_id': str(activity['_id']),
         'project_name': activity['project_name'],
@@ -52,10 +50,10 @@ def activity_helper(activity) -> dict:
     }
 
 
-def get_random_string(length: int=12) -> str:
+def get_random_string(length: int=12) -> str: #TESTED
     return "".join(random.choice(string.ascii_letters) for _ in range(length))
 
-def hash_password(password: str, salt: str = None):
+def hash_password(password: str, salt: str = None): #TESTED
     if salt is None:
         salt = get_random_string()
     enc = hashlib.pbkdf2_hmac(
@@ -66,14 +64,14 @@ def hash_password(password: str, salt: str = None):
     )
     return enc.hex()
 
-def validate_password(password: str, hashed_password: str) -> bool:
+def validate_password(password: str, hashed_password: str) -> bool: #TESTED
     salt, hashed = hashed_password.split("$")
     return hash_password(password, salt) == hashed
 
-async def get_user_by_login(login: str):
+async def get_user_by_login(login: str): #TESTED
     return await database.users_collection.find_one({"login": login})
 
-async def create_user_token(user_id: str):
+async def create_user_token(user_id: str): #TESTED
     token_query = {
         "user_id": user_id,
         "expires": datetime.now() + timedelta(weeks=2),
@@ -84,7 +82,7 @@ async def create_user_token(user_id: str):
     token = await database.tokens_collection.find_one({"_id": token_id})
     return token_helper(token)
 
-async def create_user(user: models.UserCreate):
+async def create_user(user: models.UserCreate): #TESTED
     salt = get_random_string()
     hashed_password = hash_password(user.password, salt)
     new_user = {
@@ -110,41 +108,9 @@ async def create_user(user: models.UserCreate):
         "token": token_dict
     }
 
-async def set_status(status, user):
-    result = await database.users_collection.update_one(
-        {"login": user["login"]},
-        {"$set" : {"status": status}}
-    )
-    return result.modified_count
-
-async def get_status(user) -> str:
-    result = await database.users_collection.find_one({"login": user["login"]})
-    return user_helper(result)["status"]
-
-SECRET_KEY = settings.secret_key
-ALGORITHM = settings.algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
-COOKIE_NAME = 'Authorization'
-
-
-def verify_access_token(token: str, credentials_exception):
-
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        id: str = payload.get("user_id")
-
-        if id is None:
-            raise credentials_exception
-
-        token_data = models.TokenData(id=id)
-
-    except JWTError:
-        raise credentials_exception
-
-    return token_data
 
 async def get_current_user_from_cookie(request:Request):
-    token=request.cookies.get(COOKIE_NAME)
+    token=request.cookies.get('Authorization')
     if token:
         user = await database.users_collection.find_one(
             {"_id": ObjectId(token[57:81])}
@@ -152,7 +118,7 @@ async def get_current_user_from_cookie(request:Request):
         return user
 
 
-async def create_activity(activity: models.ActivityModel):
+async def create_activity(activity: models.ActivityModel): #TESTED
     new_activity = {
         'activity_name': activity.activity_name,
         'project_name': activity.project_name,
@@ -167,28 +133,7 @@ async def create_activity(activity: models.ActivityModel):
     return str(activity_id.inserted_id)
 
 
-async def set_time(activity: ObjectId, time: int):
-    result = await database.activities_collection.update_one(
-        {"_id": activity},
-        {"$set" : {"time": time}}
-    )
-    return result.modified_count
-
-async def set_activity_translator(activity: ObjectId, translator_id: ObjectId):
-    result = await database.activities_collection.update_one(
-        {"_id": activity},
-        {"$set" : {"translator": translator_id}}
-    )
-    return result.modified_count
-
-async def set_activity_editor(activity: ObjectId, editor_id: ObjectId):
-    result = await database.activities_collection.update_one(
-        {"_id": activity},
-        {"$set" : {"editor": editor_id}}
-    )
-    return result.modified_count
-
-async def edit_project(activity: models.ActivityModel, activity_id: str):
+async def edit_project(activity: models.ActivityModel, activity_id: str): #TESTED
     result = await database.activities_collection.update_one(
         {"_id": ObjectId(activity_id)},
         {"$set" : 
@@ -201,7 +146,7 @@ async def edit_project(activity: models.ActivityModel, activity_id: str):
     )
     return result.modified_count
 
-async def edit_activity(activity: models.ActivityModel, activity_id: str):
+async def edit_activity(activity: models.ActivityModel, activity_id: str): #TESTED
     result = await database.activities_collection.update_one(
         {"_id": ObjectId(activity_id)},
         {"$set" : 
@@ -214,7 +159,7 @@ async def edit_activity(activity: models.ActivityModel, activity_id: str):
     )
     return result.modified_count
 
-async def get_projects(status: str):
+async def get_projects(status: str): #TESTED
     projects = []
     async for project in database.activities_collection.find({
         'activity_name': 'initial_activity', 'project_status': status}
@@ -222,36 +167,21 @@ async def get_projects(status: str):
         projects.append(project_helper(project))
     return projects
 
-async def get_project(project_name: str):
-    result = await database.activities_collection.find_one(
-        {'project_name': project_name}
-    )
-    return project_helper(result)
-
-async def get_project_by_id(project_id: str):
+async def get_project_by_id(project_id: str): #TESTED
     result = await database.activities_collection.find_one(
         {'_id': ObjectId(project_id)}
     )
     return project_helper(result)
 
-async def get_activities():
-    result = await database.activities_collection.distinct('activity_name')
-    return result
 
-async def get_current_user():
+async def get_current_user(): #TESTED
     pass
 
-async def get_project_names():
+async def get_project_names(): #TESTED
     result = await database.activities_collection.distinct('project_name')
     return result
 
-async def get_activity(activity_name: str):
-    result = await database.activities_collection.find_one(
-        {'activity_name': activity_name}
-    )
-    return activity_helper(result)
-
-async def get_activities_of_the_project(project: str):
+async def get_activities_of_the_project(project: str): #TESTED
     activities_list = []
     async for activity in database.activities_collection.find(
         {'project_name': project}
@@ -259,7 +189,7 @@ async def get_activities_of_the_project(project: str):
         activities_list.append(activity_helper(activity))
     return activities_list
 
-async def get_list_of_users(role: str):
+async def get_list_of_users(role: str): #TESTED
     users = []
     async for user in database.users_collection.find({'role': role}):
         users.append(
@@ -270,13 +200,13 @@ async def get_list_of_users(role: str):
         )
     return users
 
-async def get_user_by_id(user_id: str):
+async def get_user_by_id(user_id: str): #TESTED
     result = await database.users_collection.find_one(
         {'_id': ObjectId(user_id)}
     )
     return user_helper(result)
 
-async def get_user_activities(user_id: str, user_role: str):
+async def get_user_activities(user_id: str, user_role: str): #TESTED
     activities_list = []
     async for activity in database.activities_collection.find(
         {user_role: user_id}

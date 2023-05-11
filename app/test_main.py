@@ -132,6 +132,70 @@ def test_user_helper_valid():
         'is_active': True
     }
 
+def test_project_helper_valid():
+    project = {
+        'project_name': 'Test',
+        'editor': '643bf7db29a8f8dcc00a1bd9',
+        'project_status': 'finished',
+        'deadline': "2023-04-30T19:36:40.236Z",
+        '_id': '643bf7db29a8f8dcc00a1bd9'
+    }
+    assert users.project_helper(project) == {
+        'project_name': 'Test', 
+        'editor': '643bf7db29a8f8dcc00a1bd9', 
+        'status': 'finished', 
+        'deadline': '2023-04-30T19:36:40.236Z', 
+        'id': '643bf7db29a8f8dcc00a1bd9'
+    }
+
+def test_project_helper_invalid():
+    project = {
+        'editor': '643bf7db29a8f8dcc00a1bd9',
+        'project_status': 'finished',
+        'deadline': "2023-04-30T19:36:40.236Z",
+        '_id': '643bf7db29a8f8dcc00a1bd9'
+    }
+    with pytest.raises(KeyError):
+        users.user_helper(project)
+
+def test_activity_helper_valid():
+    activity = {
+        '_id': '643bf7db29a8f8dcc00a1bd9',
+        'project_name': 'test',
+        'editor': '643bf7db29a8f8dcc00a1bd9',
+        'status': 'in_work',
+        'activity_name': 'test',
+        'translators': '643bf7db29a8f8dcc00a1bd9',
+        'deadline': '2023-04-30T19:36:40.236Z',
+        'project_status': 'finished',
+        'completeness': 0
+    }
+    assert users.activity_helper(activity) == {
+        '_id': '643bf7db29a8f8dcc00a1bd9',
+        'project_name': 'test',
+        'editor': '643bf7db29a8f8dcc00a1bd9', 
+        'status': 'in_work',
+        'activity_name': 'test',
+        'translator': '643bf7db29a8f8dcc00a1bd9',
+        'deadline': '2023-04-30T19:36:40.236Z', 
+        'project_status': 'finished', 
+        'completeness': 0
+    }
+
+def test_activity_helper_invalid():
+    activity = {
+        'project_name': 'test',
+        'editor': '643bf7db29a8f8dcc00a1bd9',
+        'status': 'in_work',
+        'activity_name': 'test',
+        'translators': '643bf7db29a8f8dcc00a1bd9',
+        'deadline': '2023-04-30T19:36:40.236Z',
+        'project_status': 'finished',
+        'completeness': 0
+    }
+    with pytest.raises(KeyError):
+        users.user_helper(activity)
+
 def test_user_helper_invalid():
     user = {
         '_id': ObjectId("643bf7db29a8f8dcc00a1bd9"),
@@ -167,11 +231,6 @@ def test_token_helper_invalid():
     }
     with pytest.raises(KeyError):
         users.user_helper(token)
-        
-
-
-
-
 
 @pytest.mark.anyio
 async def test_create_project():
@@ -385,3 +444,292 @@ async def test_get_activities_of_the_project():
     result = await users.get_activities_of_the_project('test')
     assert type(result) == type([])
 
+@pytest.mark.anyio
+async def test_get_current_user():
+    result = await users.get_current_user()
+    assert result is None
+
+@pytest.mark.anyio
+async def test_get_list_of_users_translator():
+    result = await users.get_list_of_users('translator')
+    assert type(result) == type([])
+
+@pytest.mark.anyio
+async def test_get_list_of_users_chief_editor():
+    result = await users.get_list_of_users('chief_editor')
+    assert type(result) == type([])
+
+@pytest.mark.anyio
+async def test_get_list_of_users_project_manager():
+    result = await users.get_list_of_users('project_manager')
+    assert type(result) == type([])
+
+@pytest.mark.anyio
+async def test_get_list_of_users_invalid():
+    result = await users.get_list_of_users('project_manareg')
+    assert result == []
+
+@pytest.mark.anyio
+async def test_get_project_by_id_valid():
+    result = await users.get_project_by_id('645a5064728af5c5703f5aeb')
+    assert result == {
+        'project_name': 'test', 
+        'editor': '645a4bca08eca36c3778e6a0', 
+        'status': 'created', 
+        'deadline': '2023-05-31 00:00:00', 
+        'id': '645a5064728af5c5703f5aeb'
+    }
+
+@pytest.mark.anyio
+async def test_get_project_by_id_invalid():
+    with pytest.raises(TypeError):
+        await users.get_project_by_id('aaaaaaaaaaaaaaaaaaaaaaaa')
+
+@pytest.mark.anyio
+async def test_get_user_by_id_invalid():
+    with pytest.raises(TypeError):
+        await users.get_user_by_id('aaaaaaaaaaaaaaaaaaaaaaaa')
+
+@pytest.mark.anyio
+async def test_get_user_by_id_valid():
+    result = await users.get_user_by_id('645a485f74b6688020457c41')
+    print(result)
+    assert result == {
+        'id': '645a485f74b6688020457c41', 
+        'login': 'test', 
+        'username': 'test', 
+        'password': 'KyyheazmpJDO$aa597210ffc2b5eaff0d45d6de887378b7b34dd36b1e50f35a45dcac071d0da7', 
+        'role': 'test', 
+        'efficiency': 0.0, 
+        'status': 'test', 
+        'is_active': True
+    }
+
+@pytest.mark.anyio
+async def test_create_user_valid():
+    user = {
+        'login': 'abcb',
+        'username': 'abcb',
+        'password': 'abcb',
+        'role': 'translator',
+        'status': 'active',
+        'efficiency': 0.0,
+        'is_active': True,
+    }
+    result = await users.create_user(models.UserCreate(**user))
+    result_filtered = {
+        'login': result['login'],
+        'username': result['username'], 
+        'password': result['password'], 
+        'role': result['role'], 
+        'status': result['status'], 
+        'efficiency': result['efficiency'], 
+        'is_active': result['is_active'], 
+    }
+    assert result_filtered == {
+        'login': 'abcb', 
+        'username': 'abcb', 
+        'password': 'abcb', 
+        'role': 'translator', 
+        'status': 'active', 
+        'efficiency': 0.0, 
+        'is_active': True, 
+    }
+
+@pytest.mark.anyio
+async def test_create_user_invalid():
+    user = {
+        'username': 'abcb',
+        'password': 'abcb',
+        'role': 'translator',
+        'status': 'active',
+        'efficiency': 0.0,
+        'is_active': True,
+    }
+    with pytest.raises(ValidationError):
+        await users.create_user(models.UserCreate(**user))
+
+@pytest.mark.anyio
+async def test_get_projects_finished():
+    result = await users.get_projects('finished')
+    print(result)
+    assert result == [
+        {
+            'project_name': '645c90164496e85f3d4aa29f', 
+            'editor': '645a4bca08eca36c3778e6a0', 
+            'status': 'finished', 
+            'deadline': '2022-08-05 00:00:00', 
+            'id': '645c90164496e85f3d4aa2a0'
+        }
+    ]
+
+
+@pytest.mark.anyio
+async def test_get_projects_created():
+    result = await users.get_projects('created')
+    assert type(result) == type([])
+
+@pytest.mark.anyio
+async def test_get_projects_invalid():
+    result = await users.get_projects('random')
+    assert result == []
+
+@pytest.mark.anyio
+async def test_edit_activity_valid():
+    activity = {
+        'activity_name': 'Random',
+        'project_name': '645c90abc6520459d2080bb1',
+        'translators': '645c90abc6520459d2080bb1',
+        'editor': '645a4bca08eca36c3778e6a0',
+        'deadline': datetime.datetime.now(),
+        'project_status': 'in work',
+        'completeness': 0.0,
+        'status': 'created',
+    }
+    result = await users.edit_activity(
+        models.ActivityModel(**activity), 
+        '645c90abc6520459d2080bb2'
+    )
+    assert result == 1
+
+@pytest.mark.anyio
+async def test_edit_activity_invalid():
+    activity = {
+        'activity_name': 'Random',
+        'project_name': '645c90abc6520459d2080bb1',
+        'translators': '645c90abc6520459d2080bb1',
+        'editor': '645a4bca08eca36c3778e6a0',
+        'project_status': 'in work',
+        'completeness': 0.0,
+        'status': 'created',
+    }
+    with pytest.raises(ValidationError):
+        await users.edit_activity(
+            models.ActivityModel(**activity), 
+            '645c90abc6520459d2080bb2'
+        )
+
+@pytest.mark.anyio
+async def test_edit_project_valid():
+    activity = {
+        'activity_name': 'initial_activity',
+        'project_name': 'Random',
+        'translators': '645c90abc6520459d2080bb1',
+        'editor': '645a4bca08eca36c3778e6a0',
+        'deadline': datetime.datetime.now(),
+        'project_status': 'in work',
+        'completeness': 0.0,
+        'status': 'created',
+    }
+    result = await users.edit_activity(
+        models.ActivityModel(**activity), 
+        '645a52f2cdbdcc9aac282c0e'
+    )
+    assert result == 1
+
+@pytest.mark.anyio
+async def test_edit_project_invalid_unit():
+    activity = {
+        'activity_name': 'initial_activity',
+        'project_name': 'Random',
+        'translators': '645c90abc6520459d2080bb1',
+        'editor': '645a4bca08eca36c3778e6a0',
+        'deadline': datetime.datetime.now(),
+        'project_status': 'in work',
+        'status': 'created',
+    }
+    with pytest.raises(ValidationError):
+        await users.edit_activity(
+            models.ActivityModel(**activity), 
+            '645c90abc6520459d2080bb2'
+        )
+
+@pytest.mark.anyio
+async def test_create_activity_qa():
+    '''
+    WHEN
+    Activity name IS Tesst
+    Deadline IS 2023-05-31
+    Translator IS abcb
+    
+    THEN
+    Activity created
+    '''
+    request_create_activity = 'activity_name=Tesst&project_name=645a5252a125ff04c2a26123&current_chief_editor=645a4bca08eca36c3778e6a0&project_id=645a5252a125ff04c2a26124&deadline=2023-05-31&translator=645caf84fc7d556776d73dbb'
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response_create_activity = await ac.post(
+            "/project/create_activity", 
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_create_activity
+        )
+    assert response_create_activity.status_code == 303
+
+@pytest.mark.anyio
+async def test_create_activity_qa_invalid():
+    '''
+    WHEN
+    Activity name IS Tesst
+    Deadline IS 2023-05-31
+    
+    THEN
+    Activity not created
+    '''
+    request_create_activity = 'activity_name=Tesst&project_name=645a5252a125ff04c2a26123&current_chief_editor=645a4bca08eca36c3778e6a0&project_id=645a5252a125ff04c2a26124&deadline=2023-05-31'
+    with pytest.raises(KeyError):
+        async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+            await ac.post(
+                "/project/create_activity", 
+                headers={
+                    'Content-Type': 'application/x-www-form-urlencoded', 
+                    'accept': 'application/json'
+                }, 
+                data=request_create_activity
+            )
+
+@pytest.mark.anyio
+async def test_edit_activity_qa():
+    '''
+    WHEN
+    Activity name IS Tesst
+    Deadline IS 2023-05-31
+    Translator IS abcb
+    
+    THEN
+    Activity edited
+    '''
+    request_create_activity = 'activity_id=645a521df25b7b22ce3e4866&activity_name=Tesst&project_name=645a5252a125ff04c2a26123&current_chief_editor=645a4bca08eca36c3778e6a0&project_id=645a5252a125ff04c2a26124&deadline=2023-05-31&translator=645caf84fc7d556776d73dbb'
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response_create_activity = await ac.post(
+            "/project/edit_activity", 
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'accept': 'application/json'
+            }, 
+            data=request_create_activity
+        )
+    assert response_create_activity.status_code == 303
+
+@pytest.mark.anyio
+async def test_edit_activity_qa_invalid():
+    '''
+    WHEN
+    Activity name IS Tesst
+    Deadline IS 2023-05-31
+    
+    THEN
+    Activity edited
+    '''
+    request_create_activity = 'activity_id=645a521df25b7b22ce3e4866&activity_name=Tesst&project_name=645a5252a125ff04c2a26123&current_chief_editor=645a4bca08eca36c3778e6a0&project_id=645a5252a125ff04c2a26124&deadline=2023-05-31'
+    with pytest.raises(KeyError):
+        async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+            await ac.post(
+                "/project/edit_activity", 
+                headers={
+                    'Content-Type': 'application/x-www-form-urlencoded', 
+                    'accept': 'application/json'
+                }, 
+                data=request_create_activity
+            )
