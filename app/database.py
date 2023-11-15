@@ -1,9 +1,9 @@
 import motor.motor_asyncio
 from os import environ
 import asyncio
+from config import settings
 
-MONGO_DETAILS = ("mongodb://admin:password123@localhost:27017/fastapi?authSource=admin")
-
+MONGO_DETAILS = (f'mongodb://{settings.mongo_initdb_root_username}:{settings.mongo_initdb_root_password}@mongo:27017/{settings.mongo_initdb_database}?authSource=admin')
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
 client.get_io_loop = asyncio.get_event_loop
 
